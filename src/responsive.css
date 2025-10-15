@@ -1,0 +1,71 @@
+/* Global responsive tweaks beyond Tailwind utilities */
+
+/* Hero/offer banner height scales by viewport */
+.hero-banner {
+  height: 18rem; /* base ~ h-72 */
+}
+
+@media (max-width: 640px) {
+  /* Small phones */
+  .hero-banner {
+    height: 14rem; /* compact */
+    border-radius: 1rem;
+  }
+  .section-title {
+    font-size: 1.5rem; /* ~text-2xl */
+    line-height: 2rem;
+  }
+  .container-padded {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  /* Cards stack tighter on small screens */
+  .cards-grid {
+    row-gap: 1rem;
+  }
+  /* Destination modal buttons should be full width and centered */
+  .dest-actions .primary,
+  .dest-actions .secondary {
+    width: 100%;
+    justify-self: center;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 767px) {
+  /* Large phones / small tablets */
+  .hero-banner {
+    height: 16rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablets */
+  .hero-banner {
+    height: 20rem;
+  }
+  .section-title {
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Small laptops */
+  .hero-banner {
+    height: 22rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  /* Desktops and above */
+  .hero-banner {
+    height: 24rem;
+  }
+}
+
+/* Ensure images within cards never overflow on tiny screens */
+.cards-grid img {
+  max-width: 100%;
+  /* Don't override explicit Tailwind heights like h-full/h-48 */
+  display: block;
+}
