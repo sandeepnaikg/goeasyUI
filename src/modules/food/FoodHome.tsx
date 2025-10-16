@@ -16,6 +16,9 @@ const restaurants = [
   { id: '8', name: 'Sushi World', cuisine: 'Japanese, Sushi', rating: 4.5, deliveryTime: '30-40 min', price: 550, image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg', offer: 'Combo Meals', description: 'Nigiri, maki, and hot ramen bowls made to order.' },
   { id: '9', name: 'Mediterraneo', cuisine: 'Mediterranean', rating: 4.6, deliveryTime: '35-45 min', price: 450, image: 'https://images.pexels.com/photos/1435907/pexels-photo-1435907.jpeg', offer: 'Free Drink', description: 'Falafel, hummus, kebabs, and pita wraps.' },
   { id: '10', name: 'Cafe Delight', cuisine: 'Cafe, Desserts', rating: 4.3, deliveryTime: '20-25 min', price: 220, image: 'https://images.pexels.com/photos/302680/pexels-photo-302680.jpeg', offer: 'Buy 2 Get 1', description: 'Artisanal coffees, pastries, and desserts.' }
+  ,
+  { id: '11', name: 'Tandoori Tales', cuisine: 'North Indian, Grill', rating: 4.4, deliveryTime: '35-40 min', price: 380, image: 'https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg', offer: 'Free Starter', description: 'Smoky kebabs, rotis, and creamy curries.' },
+  { id: '12', name: 'Pasta Palace', cuisine: 'Italian', rating: 4.2, deliveryTime: '25-30 min', price: 420, image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg', offer: '25% OFF', description: 'Fresh pasta with rich sauces and herbs.' }
 ];
 
 export default function FoodHome() {
@@ -64,7 +67,7 @@ export default function FoodHome() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+  <div className="min-h-screen bg-[#F3F0FF]">
       <div className="app-shell py-5">
         <div className="mb-4">
           <BookedRecentlyCard module="food" />

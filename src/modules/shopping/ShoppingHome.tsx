@@ -1,4 +1,5 @@
 import { Search, Heart, Star, TrendingUp, Zap } from 'lucide-react';
+import { FaLaptop, FaTshirt, FaHome, FaSpa, FaFutbol, FaBook, FaBlenderPhone, FaGamepad, FaBaby, FaDumbbell, FaBriefcaseMedical, FaShoppingBasket } from 'react-icons/fa';
 import { useApp } from '../../context/AppContext';
 import ImageWithFallback from '../../components/ImageWithFallback';
 import BookedRecentlyCard from '../../components/BookedRecentlyCard';
@@ -109,22 +110,125 @@ const products = [
     discount: 12,
     badge: 'Pro Choice',
     description: 'Full-frame mirrorless, 20MP sensor, 4K video, Dual Pixel AF II.'
+  },
+  {
+    id: '9',
+    name: 'Samsung Front Load Washer',
+    category: 'Appliances',
+    price: 35990,
+    originalPrice: 42990,
+    rating: 4.4,
+    reviews: 654,
+    image: 'https://images.pexels.com/photos/3952035/pexels-photo-3952035.jpeg?auto=compress&cs=tinysrgb&w=600',
+    discount: 16,
+    badge: 'Appliances',
+    description: 'Hygiene steam, inverter motor, 5-star energy rating.'
+  },
+  {
+    id: '10',
+    name: 'PlayStation 5 Console',
+    category: 'Gaming',
+    price: 49990,
+    originalPrice: 54990,
+    rating: 4.9,
+    reviews: 12043,
+    image: 'https://images.pexels.com/photos/1337247/pexels-photo-1337247.jpeg?auto=compress&cs=tinysrgb&w=600',
+    discount: 9,
+    badge: 'Hot',
+    description: 'Ultra-fast SSD, 4K gaming, DualSense controller.'
+  },
+  {
+    id: '11',
+    name: 'Huggies Dry Diapers - XL (64)',
+    category: 'Kids',
+    price: 899,
+    originalPrice: 1099,
+    rating: 4.5,
+    reviews: 4567,
+    image: 'https://images.pexels.com/photos/3933279/pexels-photo-3933279.jpeg?auto=compress&cs=tinysrgb&w=600',
+    discount: 18,
+    badge: 'Essentials',
+    description: '12-hr absorption, cottony soft, wetness indicator.'
+  },
+  {
+    id: '12',
+    name: 'Protein Whey – 2kg Jar',
+    category: 'Fitness',
+    price: 2999,
+    originalPrice: 3499,
+    rating: 4.2,
+    reviews: 874,
+    image: 'https://images.pexels.com/photos/4046692/pexels-photo-4046692.jpeg?auto=compress&cs=tinysrgb&w=600',
+    discount: 14,
+    badge: 'Trending',
+    description: '24g protein per scoop, BCAAs, fast absorption.'
   }
 ];
 
 const categories = [
-  { name: 'Electronics', icon: '📱' },
-  { name: 'Fashion', icon: '👕' },
-  { name: 'Home', icon: '🏠' },
-  { name: 'Beauty', icon: '💄' },
-  { name: 'Sports', icon: '⚽' },
-  { name: 'Books', icon: '📚' }
+  { name: 'Electronics', icon: <FaLaptop className="w-8 h-8" /> },
+  { name: 'Fashion', icon: <FaTshirt className="w-8 h-8" /> },
+  { name: 'Home', icon: <FaHome className="w-8 h-8" /> },
+  { name: 'Beauty', icon: <FaSpa className="w-8 h-8" /> },
+  { name: 'Sports', icon: <FaFutbol className="w-8 h-8" /> },
+  { name: 'Books', icon: <FaBook className="w-8 h-8" /> },
+  { name: 'Appliances', icon: <FaBlenderPhone className="w-8 h-8" /> },
+  { name: 'Gaming', icon: <FaGamepad className="w-8 h-8" /> },
+  { name: 'Kids', icon: <FaBaby className="w-8 h-8" /> },
+  { name: 'Fitness', icon: <FaDumbbell className="w-8 h-8" /> },
+  { name: 'Medical', icon: <FaBriefcaseMedical className="w-8 h-8" /> },
+  { name: 'Daily Needs', icon: <FaShoppingBasket className="w-8 h-8" /> }
+] as const;
+
+// Seeded top picks for new categories
+const topAppliances = [
+  { id: 'ap1', name: 'Dyson V12 Detect Slim', category: 'Appliances', price: 55990, image: 'https://images.pexels.com/photos/4107287/pexels-photo-4107287.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ap2', name: 'LG 260L Smart Fridge', category: 'Appliances', price: 25990, image: 'https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ap3', name: 'IFB 20L Microwave', category: 'Appliances', price: 8490, image: 'https://images.pexels.com/photos/813475/pexels-photo-813475.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ap4', name: 'Philips Air Fryer XL', category: 'Appliances', price: 9990, image: 'https://images.pexels.com/photos/3807339/pexels-photo-3807339.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ap5', name: 'Bosch Dishwasher 12P', category: 'Appliances', price: 39990, image: 'https://images.pexels.com/photos/3944342/pexels-photo-3944342.jpeg?auto=compress&cs=tinysrgb&w=600' },
+];
+const topGaming = [
+  { id: 'ga1', name: 'Xbox Series X', category: 'Gaming', price: 48990, image: 'https://images.pexels.com/photos/4792731/pexels-photo-4792731.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ga2', name: 'Nintendo Switch OLED', category: 'Gaming', price: 32990, image: 'https://images.pexels.com/photos/1337247/pexels-photo-1337247.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ga3', name: 'Logitech G Pro Wireless', category: 'Gaming', price: 9990, image: 'https://images.pexels.com/photos/452645/pexels-photo-452645.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ga4', name: 'Razer Huntsman Mini', category: 'Gaming', price: 8999, image: 'https://images.pexels.com/photos/5699345/pexels-photo-5699345.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ga5', name: 'Sony Pulse 3D Headset', category: 'Gaming', price: 8490, image: 'https://images.pexels.com/photos/3945656/pexels-photo-3945656.jpeg?auto=compress&cs=tinysrgb&w=600' },
+];
+const topKids = [
+  { id: 'kd1', name: 'LEGO City Builder Set', category: 'Kids', price: 2990, image: 'https://images.pexels.com/photos/3662667/pexels-photo-3662667.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'kd2', name: 'Crayola Colors 64', category: 'Kids', price: 699, image: 'https://images.pexels.com/photos/159823/color-pencil-drawing-coloring-colored-pencils-159823.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'kd3', name: 'Remote RC Car', category: 'Kids', price: 1999, image: 'https://images.pexels.com/photos/207924/pexels-photo-207924.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'kd4', name: 'Story Books Pack', category: 'Kids', price: 899, image: 'https://images.pexels.com/photos/256369/pexels-photo-256369.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'kd5', name: 'Soft Plush Bear', category: 'Kids', price: 799, image: 'https://images.pexels.com/photos/461230/pexels-photo-461230.jpeg?auto=compress&cs=tinysrgb&w=600' },
+];
+const topFitness = [
+  { id: 'ft1', name: 'Yoga Mat (6mm)', category: 'Fitness', price: 999, image: 'https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ft2', name: 'Dumbbell Set 10kg', category: 'Fitness', price: 2499, image: 'https://images.pexels.com/photos/1552249/pexels-photo-1552249.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ft3', name: 'Resistance Bands', category: 'Fitness', price: 699, image: 'https://images.pexels.com/photos/3845988/pexels-photo-3845988.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ft4', name: 'Skipping Rope Pro', category: 'Fitness', price: 499, image: 'https://images.pexels.com/photos/3993154/pexels-photo-3993154.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'ft5', name: 'Sports Bottle Steel', category: 'Fitness', price: 799, image: 'https://images.pexels.com/photos/279316/pexels-photo-279316.jpeg?auto=compress&cs=tinysrgb&w=600' },
+];
+const topMedical = [
+  { id: 'md1', name: 'Paracetamol 650mg (15 tabs)', category: 'Medical • Medicines', price: 49, image: 'https://images.pexels.com/photos/208512/pexels-photo-208512.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'md2', name: 'Vitamin C 1000mg', category: 'Medical • Supplements', price: 299, image: 'https://images.pexels.com/photos/3683077/pexels-photo-3683077.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'md3', name: 'Digital Thermometer', category: 'Medical • Devices', price: 349, image: 'https://images.pexels.com/photos/7659570/pexels-photo-7659570.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'md4', name: 'Oximeter Fingertip', category: 'Medical • Devices', price: 1299, image: 'https://images.pexels.com/photos/4269250/pexels-photo-4269250.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'md5', name: 'Ayurvedic Chyawanprash', category: 'Medical • Health', price: 199, image: 'https://images.pexels.com/photos/7615461/pexels-photo-7615461.jpeg?auto=compress&cs=tinysrgb&w=600' },
+];
+const topDaily = [
+  { id: 'dn1', name: 'Toothpaste 150g', category: 'Daily Needs', price: 79, image: 'https://images.pexels.com/photos/2568639/pexels-photo-2568639.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'dn2', name: 'Handwash 500ml', category: 'Daily Needs', price: 129, image: 'https://images.pexels.com/photos/3987143/pexels-photo-3987143.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'dn3', name: 'Detergent 1kg', category: 'Daily Needs', price: 199, image: 'https://images.pexels.com/photos/7311023/pexels-photo-7311023.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'dn4', name: 'Cooking Oil 1L', category: 'Daily Needs', price: 149, image: 'https://images.pexels.com/photos/235788/pexels-photo-235788.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { id: 'dn5', name: 'Rice 5kg Premium', category: 'Daily Needs', price: 449, image: 'https://images.pexels.com/photos/4110256/pexels-photo-4110256.jpeg?auto=compress&cs=tinysrgb&w=600' },
 ];
 
 export default function ShoppingHome() {
   const { setCurrentPage } = useApp();
 
-  const handleProductClick = (product: typeof products[0]) => {
+  type BasicProduct = { id: string; name: string; category: string; price: number; image: string; description?: string };
+  const handleProductClick = (product: BasicProduct) => {
     localStorage.setItem('selectedProduct', JSON.stringify(product));
     setCurrentPage('shopping-details');
   };
@@ -135,8 +239,33 @@ export default function ShoppingHome() {
     setCurrentPage('shopping-category');
   };
 
+  const renderCarousel = (title: string, items: Array<{ id: string; name: string; category: string; price: number; image: string }>) => (
+    <div className="mb-6">
+      <div className="flex items-center space-x-2 mb-2">
+        <TrendingUp className="w-5 h-5 text-gray-700" />
+        <h2 className="text-lg font-bold text-gray-900">Top picks • {title}</h2>
+      </div>
+      <div className="overflow-x-auto no-scrollbar">
+        <div className="flex gap-3 pr-2">
+          {items.map((p) => (
+            <button key={p.id} onClick={() => handleProductClick(p)} className="group bg-white rounded-2xl border border-gray-200 shadow hover:shadow-lg transition-all hover:-translate-y-0.5 min-w-[260px] text-left">
+              <div className="w-[260px] h-[160px] overflow-hidden rounded-t-2xl">
+                <ImageWithFallback src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              </div>
+              <div className="p-4">
+                <div className="text-xs text-gray-500 mb-1">{p.category}</div>
+                <div className="font-semibold text-gray-900 line-clamp-1">{p.name}</div>
+                <div className="text-sm text-gray-700">₹{p.price.toLocaleString()}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-  <div className="min-h-screen bg-white pb-20 text-gray-900">
+  <div className="min-h-screen bg-[#F3F0FF] pb-20 text-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-5">
         <div className="mb-4">
           <BookedRecentlyCard module="shopping" />
@@ -172,14 +301,14 @@ export default function ShoppingHome() {
                 onClick={() => handleCategoryClick(category.name)}
                 className="bg-white hover:bg-gray-50 rounded-2xl p-6 text-center transition-all border border-gray-200 shadow"
               >
-                <div className="text-4xl mb-2">{category.icon}</div>
+                <div className="text-4xl mb-2 flex items-center justify-center text-gray-800">{category.icon}</div>
                 <div className="text-gray-800 font-semibold text-sm">{category.name}</div>
               </button>
             ))}
           </div>
-        </div>
+    </div>
 
-        {/* Horizontal carousel */}
+  {/* Horizontal carousel */}
         <div className="mb-6">
           <div className="flex items-center space-x-2 mb-2">
             <TrendingUp className="w-5 h-5 text-cyan-600" />
@@ -201,6 +330,16 @@ export default function ShoppingHome() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Top picks carousels for new categories */}
+        <div>
+          {renderCarousel('Appliances', topAppliances)}
+          {renderCarousel('Gaming', topGaming)}
+          {renderCarousel('Kids', topKids)}
+          {renderCarousel('Fitness', topFitness)}
+          {renderCarousel('Medical & Medicines', topMedical)}
+          {renderCarousel('Daily Needs', topDaily)}
         </div>
 
   <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-5 mb-6 text-white">
@@ -225,18 +364,18 @@ export default function ShoppingHome() {
             <h2 className="text-lg font-bold text-gray-900">Trending Products</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {products.map((product) => (
               <button
                 key={product.id}
                 onClick={() => handleProductClick(product)}
                 className="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all hover:scale-105 transform duration-300 text-left border border-gray-200 shadow"
               >
-                <div className="relative">
+                <div className="relative h-[160px] overflow-hidden">
                   <ImageWithFallback
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-full object-cover"
                   />
                   <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
                     <Heart className="w-5 h-5 text-red-500" />

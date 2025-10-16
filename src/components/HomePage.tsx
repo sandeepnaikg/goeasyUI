@@ -332,7 +332,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen pb-24 md:pb-0 bg-[#f4f6fa] flex flex-col w-full">
+    <div className="min-h-screen pb-24 md:pb-0 bg-[#F3F0FF] flex flex-col w-full">
       <div className="app-shell py-5 bg-white sm:rounded-2xl flex-1">
         {/* Signup prompt removed per request: logged-out users see Home without signup banner */}
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, Clock, Calendar, Languages, Film, Heart } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import ImageWithFallback from '../../components/ImageWithFallback';
+import TrustBadges from '../../components/TrustBadges';
 
 type Show = { id: string; time: string; type: string; price: number; filling: string };
 type Theater = { id: string; name: string; facilities: string[]; shows: Show[] };
@@ -133,6 +134,7 @@ export default function TicketsDetails() {
 
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Date</h2>
+          <div className="mb-3"><TrustBadges context="detail" /></div>
           <div className="flex space-x-3 overflow-x-auto pb-2">
             {dates.map((d) => (
               <button

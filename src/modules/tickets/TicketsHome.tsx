@@ -99,6 +99,46 @@ const movies = [
     releaseDate: 'Now Showing',
     description: 'A vigilante returns in a high-octane mission of justice.'
   }
+  ,
+  {
+    id: '8',
+    title: 'RRR: Rise Again',
+    genre: 'Action, Drama',
+    rating: 4.4,
+    votes: '88K',
+    language: 'Hindi, Telugu, Tamil',
+    format: '2D',
+    duration: '2h 50m',
+    image: 'https://images.pexels.com/photos/7991305/pexels-photo-7991305.jpeg?auto=compress&cs=tinysrgb&w=600',
+    releaseDate: 'Now Showing',
+    description: 'Epic saga continues with breathtaking action and emotion.'
+  },
+  {
+    id: '9',
+    title: 'Avatar: The Deep',
+    genre: 'Sci-Fi, Adventure',
+    rating: 4.6,
+    votes: '190K',
+    language: 'English, Hindi, Tamil',
+    format: '3D, IMAX',
+    duration: '3h 10m',
+    image: 'https://images.pexels.com/photos/7991573/pexels-photo-7991573.jpeg?auto=compress&cs=tinysrgb&w=600',
+    releaseDate: '2025-11-01',
+    description: 'Return to Pandora with stunning visuals and new worlds.'
+  },
+  {
+    id: '10',
+    title: 'KGF Chapter 3',
+    genre: 'Action, Thriller',
+    rating: 4.5,
+    votes: '145K',
+    language: 'Kannada, Hindi, Tamil, Telugu',
+    format: '2D',
+    duration: '2h 45m',
+    image: 'https://images.pexels.com/photos/7991449/pexels-photo-7991449.jpeg?auto=compress&cs=tinysrgb&w=600',
+    releaseDate: 'Now Showing',
+    description: 'The saga continues with power, politics, and gold.'
+  }
 ];
 
 const offers = [
@@ -133,7 +173,7 @@ export default function TicketsHome() {
   };
 
   return (
-  <div className="min-h-screen bg-white pb-20">
+  <div className="min-h-screen bg-[#F3F0FF] pb-20">
     <div className="app-shell py-5">
         <div className="mb-4">
           <BookedRecentlyCard module="tickets" />

@@ -17,7 +17,13 @@ export default function TicketsConfirmation() {
 
   useEffect(() => {
     const seatsData = JSON.parse(localStorage.getItem('selectedSeats') || '{}');
-    setBookingData(seatsData);
+    // Prefer enriched lastTicketOrder if present (contains addons and final total)
+    const lastOrder = JSON.parse(localStorage.getItem('lastTicketOrder') || 'null');
+    if (lastOrder) {
+      setBookingData({ showData: lastOrder.show, seats: lastOrder.seats, total: lastOrder.total, addons: lastOrder.addons } as unknown as BookingData);
+    } else {
+      setBookingData(seatsData);
+    }
     setBookingId('TKT' + Math.random().toString(36).substr(2, 10).toUpperCase());
   }, []);
 
@@ -35,9 +41,11 @@ export default function TicketsConfirmation() {
 
   if (!bookingData) return null;
 
-  const { showData, seats, total } = bookingData as BookingData;
+  const { showData, seats, total, addons } = bookingData as BookingData & { addons?: Array<{ id: string; name: string; qty: number; price: number }> };
   const seatNumbers = (seats || []).map((s: Seat) => s.id).join(', ');
   const hasFreeCoke = (seats || []).length >= 2;
+  const baseTicketsSum = (seats || []).reduce((s: number, seat: Seat) => s + (seat.price || 0), 0);
+  const fees = Math.round(baseTicketsSum * 0.05); // mock 5% convenience fee for illustration
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] pb-24">
@@ -106,10 +114,34 @@ export default function TicketsConfirmation() {
             </div>
 
             <div className="border-t border-b border-gray-200 py-4 mb-6">
-              <div className="flex justify-between items-center text-gray-700 mb-2">
-                <span>Tickets ({seats?.length}x)</span>
-                <span className="font-semibold">₹{total?.toLocaleString()}</span>
+              <div className="mb-2">
+                <div className="text-sm font-semibold text-gray-800">Tickets ({seats?.length}x)</div>
+                <div className="mt-1 space-y-1 text-sm text-gray-700">
+                  {(seats || []).map((s: Seat) => (
+                    <div key={s.id} className="flex justify-between">
+                      <span>Seat {s.id}</span>
+                      <span>₹{(s.price || 0).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+              <div className="flex justify-between items-center text-gray-700 mb-2">
+                <span>Convenience Fee</span>
+                <span className="font-semibold">₹{fees.toLocaleString()}</span>
+              </div>
+              {Array.isArray(addons) && addons.length>0 && (
+                <div className="mb-2">
+                  <div className="text-sm font-semibold text-gray-800">Add-ons</div>
+                  <div className="mt-1 space-y-1 text-sm text-gray-700">
+                    {addons.map(a => (
+                      <div key={a.id} className="flex justify-between">
+                        <span>{a.name} × {a.qty}</span>
+                        <span>₹{(a.price * a.qty).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-between items-center text-xl font-bold text-gray-900">
                 <span>Total Paid</span>
                 <span className="text-purple-600">₹{total?.toLocaleString()}</span>

@@ -8,11 +8,8 @@ import {
   Search,
   Bell,
   Heart,
-  Plane,
-  UtensilsCrossed,
-  Ticket,
-  ShoppingBag,
 } from "lucide-react";
+import { FaPlane, FaUtensils, FaTicketAlt, FaShoppingBag, FaHome, FaGamepad, FaFutbol, FaTrain, FaBus, FaHotel } from 'react-icons/fa';
 import { useApp } from "../context/AppContext";
 import { useEffect, useState } from "react";
 import GlobalSearch from "./GlobalSearch";
@@ -28,12 +25,13 @@ export default function Header() {
     setCurrentPage,
     notifications,
     favorites,
-    currentPage,
   } = useApp();
   const [cartCount, setCartCount] = useState<number>(0);
   const [openSearch, setOpenSearch] = useState(false);
   const [showTopup, setShowTopup] = useState(false);
   const [topup, setTopup] = useState<string>("500");
+  const [showExplore, setShowExplore] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const unreadCount = (notifications || []).filter((n) => !n.read).length;
   const wishlistCount = favorites
     ? Object.values(favorites).filter(Boolean).length
@@ -78,8 +76,16 @@ export default function Header() {
     computeCartCount();
     const handler = () => computeCartCount();
     window.addEventListener("cart-updated", handler as EventListener);
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setScrolled(y > 20);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
     return () =>
-      window.removeEventListener("cart-updated", handler as EventListener);
+      {
+        window.removeEventListener("cart-updated", handler as EventListener);
+        window.removeEventListener('scroll', onScroll);
+      };
   }, []);
 
   const handleBack = () => {
@@ -98,7 +104,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] shadow-lg sticky top-0 z-50 border-b border-white/10">
+  <header className={`sticky top-0 z-50 border-b border-white/10 transition-all ${scrolled ? 'backdrop-blur bg-[#0A1D5E]/90 shadow-md' : 'bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] shadow-lg'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar: reduced height */}
         <div className="flex justify-between items-center h-12">
@@ -138,6 +144,15 @@ export default function Header() {
               <span className="text-xl font-bold text-white group-hover:text-amber-300 transition-colors tracking-wide">
                 Gozy
               </span>
+            </button>
+            {/* Explore moved near logo */}
+            <button
+              onClick={() => setShowExplore((s) => !s)}
+              className="inline-flex shrink-0 px-3 sm:px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all border items-center gap-2 text-white/90 hover:text-white hover:bg-white/10 border-white/20"
+              title="Explore Services"
+            >
+              <span className="inline-flex items-center justify-center w-4 h-4"><FaHome className="w-3.5 h-3.5"/></span>
+              Explore Services
             </button>
           </div>
 
@@ -278,40 +293,31 @@ export default function Header() {
           </div>
         </div>
       </div>
-      {/* Top modules bar like Airbnb categories */}
-      <div className="bg-white/5 backdrop-blur border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-auto">
-          <div className="flex justify-start md:justify-center gap-2 sm:gap-3 py-1.5">
-            {([
-              { id: 'home', label: 'Home', icon: null },
-              { id: 'travel', label: 'Travel', icon: Plane },
-              { id: 'food', label: 'Food', icon: UtensilsCrossed },
-              { id: 'tickets', label: 'Tickets', icon: Ticket },
-              { id: 'shopping', label: 'Shopping', icon: ShoppingBag },
-            ] as const).map((m) => {
-              const active = currentPage.startsWith(m.id);
-              const Icon = m.icon as unknown as ((props: { className?: string }) => JSX.Element) | null;
-              return (
-                <button
-                  key={m.id}
-                  onClick={() => {
-                    if (m.id === 'home') { setCurrentModule(null); setCurrentPage('home'); }
-                    else { setCurrentModule(m.id as 'travel'|'food'|'tickets'|'shopping'); setCurrentPage(`${m.id}-home`); }
-                  }}
-                  className={`shrink-0 px-3 sm:px-3.5 py-1 rounded-full text-sm font-semibold transition-all border flex items-center gap-2 ${active ? 'bg-white text-gray-900 border-white shadow-sm' : 'text-white/90 hover:text-white hover:bg-white/10 border-white/20'}`}
-                >
-                  {Icon ? (
-                    <span className={`inline-flex items-center justify-center w-4 h-4 ${active ? 'text-gray-900' : 'text-white/90'} transition-transform ${active ? 'scale-110' : 'group-hover:scale-105'}`}>
-                      <Icon className="w-3.5 h-3.5" />
-                    </span>
-                  ) : null}
-                  {m.label}
-                </button>
-              );
-            })}
+      {showExplore && (
+        <div className="border-t border-white/10 bg-[#0A1D5E] text-white">
+          <div className="max-w-7xl mx-auto px-4 py-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {[
+              { label: 'Flights', icon: <FaPlane/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-flights'); } },
+              { label: 'Trains', icon: <FaTrain/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-trains'); } },
+              { label: 'Buses', icon: <FaBus/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-buses'); } },
+              { label: 'Hotels', icon: <FaHotel/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-hotels'); } },
+              { label: 'Food', icon: <FaUtensils/> , to: ()=> { setCurrentModule('food'); setCurrentPage('food-home'); } },
+              { label: 'Movies', icon: <FaTicketAlt/> , to: ()=> { setCurrentModule('tickets'); setCurrentPage('tickets-home'); } },
+              { label: 'Shopping', icon: <FaShoppingBag/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
+              { label: 'Gaming', icon: <FaGamepad/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
+              { label: 'Sports', icon: <FaFutbol/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
+              { label: 'Wallet', icon: <Wallet className="w-4 h-4"/>, to: ()=> { setCurrentModule('wallet'); setCurrentPage('wallet-home'); } },
+              { label: 'Offers', icon: <Gift className="w-4 h-4"/>, to: ()=> { try { localStorage.setItem('selectedOfferCode', 'GOZY50'); } catch { /* ignore */ } setCurrentPage('home'); } },
+              { label: 'Help', icon: <Bell className="w-4 h-4"/>, to: ()=> { setCurrentPage('help-center'); } },
+            ].map(s => (
+              <button key={s.label} onClick={()=> { setShowExplore(false); s.to(); }} className="bg-white/10 hover:bg-white/15 rounded-xl p-3 flex items-center gap-2">
+                <span className="w-6 h-6 inline-flex items-center justify-center">{s.icon}</span>
+                <span className="text-sm font-semibold">{s.label}</span>
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      )}
       <GlobalSearch open={openSearch} onClose={() => setOpenSearch(false)} />
       {showTopup && (
         <div className="fixed inset-0 z-[80] bg-black/40 flex items-center justify-center">

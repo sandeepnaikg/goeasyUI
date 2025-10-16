@@ -94,6 +94,8 @@ export default function TravelHome() {
     { code: 'MAA', city: 'Chennai', name: 'Chennai International' },
     { code: 'HYD', city: 'Hyderabad', name: 'Rajiv Gandhi International' },
     { code: 'CCU', city: 'Kolkata', name: 'Netaji Subhash Chandra Bose' },
+    { code: 'GOX', city: 'Goa', name: 'Manohar International (Mopa)' },
+    { code: 'GOI', city: 'Goa', name: 'Dabolim Airport' },
   ];
   const filterAirports = (q: string) => {
     const s = q.trim().toLowerCase();
@@ -150,7 +152,7 @@ export default function TravelHome() {
   };
 
   return (
-  <div className="min-h-screen bg-white pb-20">
+  <div className="min-h-screen bg-[#F3F0FF] pb-20">
     <div className="app-shell py-6">
         {/* Booked recently card */}
         <div className="mb-4">
@@ -517,6 +519,85 @@ export default function TravelHome() {
             </div>
           </div>
         </div>
+
+        {/* Recent Fare Deals band */}
+        <section className="mt-6 mb-10">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <span className="inline-flex w-2 h-2 rounded-full bg-cyan-500" />
+              Recent Fare Deals
+            </h2>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-cyan-700 hover:text-cyan-800 text-sm font-semibold"
+            >
+              Refresh ↻
+            </button>
+          </div>
+          <div className="overflow-x-auto no-scrollbar">
+            <div className="flex gap-3 pr-2">
+              {[
+                { from: 'Bengaluru', fromCode: 'BLR', to: 'Goa', toCode: 'GOX', date: '2025-10-21', price: 3299, stops: 0, off: 18 },
+                { from: 'Mumbai', fromCode: 'BOM', to: 'Goa', toCode: 'GOI', date: '2025-10-26', price: 2899, stops: 0, off: 22 },
+                { from: 'Delhi', fromCode: 'DEL', to: 'Bengaluru', toCode: 'BLR', date: '2025-11-03', price: 4499, stops: 1, off: 15 },
+                { from: 'Hyderabad', fromCode: 'HYD', to: 'Goa', toCode: 'GOX', date: '2025-10-28', price: 3099, stops: 0, off: 12 },
+                { from: 'Chennai', fromCode: 'MAA', to: 'Mumbai', toCode: 'BOM', date: '2025-11-10', price: 3999, stops: 1, off: 10 },
+                { from: 'Kolkata', fromCode: 'CCU', to: 'Goa', toCode: 'GOI', date: '2025-11-14', price: 5599, stops: 1, off: 14 },
+                { from: 'Bengaluru', fromCode: 'BLR', to: 'Delhi', toCode: 'DEL', date: '2025-11-07', price: 4599, stops: 0, off: 9 },
+                { from: 'Mumbai', fromCode: 'BOM', to: 'Chennai', toCode: 'MAA', date: '2025-11-02', price: 3199, stops: 0, off: 13 },
+                { from: 'Delhi', fromCode: 'DEL', to: 'Goa', toCode: 'GOX', date: '2025-11-19', price: 5299, stops: 1, off: 11 },
+                { from: 'Bengaluru', fromCode: 'BLR', to: 'Goa', toCode: 'GOI', date: '2025-11-22', price: 3399, stops: 0, off: 16 },
+              ].map((d) => (
+                <div key={`${d.fromCode}-${d.toCode}-${d.date}`} className="bg-white rounded-2xl border border-gray-200 shadow hover:shadow-lg transition-all hover:-translate-y-0.5 min-w-[240px]">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-bold text-gray-900">
+                        {d.fromCode} → {d.toCode}
+                      </div>
+                      {d.off > 0 && (
+                        <div className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                          {d.off}% OFF
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-600 mb-3">
+                      {d.from} → {d.to} • {new Date(d.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} • {d.stops === 0 ? 'Nonstop' : `${d.stops} stop`}
+                    </div>
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <div className="text-xs text-gray-500">from</div>
+                        <div className="text-2xl font-bold text-cyan-700">₹{d.price.toLocaleString()}</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          // Directly perform a prefilled search to results
+                          const searchData = {
+                            type: 'flight' as const,
+                            fromLocation: `${d.from} (${d.fromCode})`,
+                            toLocation: `${d.to} (${d.toCode})`,
+                            departureDate: d.date,
+                            returnDate: '',
+                            travelers: 1,
+                          };
+                          try { localStorage.setItem('travelSearch', JSON.stringify(searchData)); localStorage.setItem('bookingType','flight'); } catch { /* ignore */ }
+                          setTravelType('flight');
+                          setFromLocation(`${d.from} (${d.fromCode})`);
+                          setToLocation(`${d.to} (${d.toCode})`);
+                          setDepartureDate(d.date);
+                          setReturnDate('');
+                          setCurrentPage('travel-results');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-semibold hover:from-teal-600 hover:to-cyan-700"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 <section className="mb-12 mt-12">
   <div className="flex justify-between items-center mb-6">
     <h2 className="text-3xl font-bold text-gray-900 section-title">Trending Destinations</h2>
@@ -529,10 +610,10 @@ export default function TravelHome() {
   </div>
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 cards-grid">
     {[
-      { id: 1, name: 'Bali', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBRQHY9wJRxI7fMTTydWRLXHmnNbNPanylcQ&s', rating: 4.9, location: 'Indonesia', price: 29999, duration: '4 Nights' },
-      { id: 2, name: 'Paris', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaNj1sfV1xkv05mg5aa3THujVeaQvOP6SMgg&s', rating: 4.8, location: 'France', price: 79999, duration: '5 Nights' },
-      { id: 3, name: 'Maldives', image: 'https://media1.thrillophilia.com/filestore/x4hn9m7uhrm35dumwpzn5optp9zb_Maldives-Vertical-6.jpg?w=400&dpr=2', rating: 4.9, location: 'South Asia', price: 99999, duration: '6 Nights' },
-      { id: 4, name: 'Swiss Alps', image: 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=600', rating: 4.9, location: 'Switzerland', price: 129999, duration: '7 Nights' }
+      { id: 1, name: 'Bali', code: 'DPS', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBRQHY9wJRxI7fMTTydWRLXHmnNbNPanylcQ&s', rating: 4.9, location: 'Indonesia', price: 29999, duration: '4 Nights' },
+      { id: 2, name: 'Paris', code: 'CDG', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaNj1sfV1xkv05mg5aa3THujVeaQvOP6SMgg&s', rating: 4.8, location: 'France', price: 79999, duration: '5 Nights' },
+      { id: 3, name: 'Maldives', code: 'MLE', image: 'https://media1.thrillophilia.com/filestore/x4hn9m7uhrm35dumwpzn5optp9zb_Maldives-Vertical-6.jpg?w=400&dpr=2', rating: 4.9, location: 'South Asia', price: 99999, duration: '6 Nights' },
+      { id: 4, name: 'Swiss Alps', code: 'ZRH', image: 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=600', rating: 4.9, location: 'Switzerland', price: 129999, duration: '7 Nights' }
     ].map(dest => (
       <div
         key={dest.id}
@@ -551,6 +632,20 @@ export default function TravelHome() {
           <div className="flex justify-between items-center">
             <span className="text-2xl font-bold text-cyan-700">₹{dest.price.toLocaleString()}</span>
             <span className="text-sm text-gray-500">{dest.duration}</span>
+          </div>
+          <div className="mt-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setTravelType('flight');
+                setToLocation(`${dest.name} (${dest.code})`);
+                if (!fromLocation) setFromLocation('Bengaluru (BLR)');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full px-3 py-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-semibold hover:from-teal-600 hover:to-cyan-700"
+            >
+              Search flights to {dest.name}
+            </button>
           </div>
         </div>
       </div>

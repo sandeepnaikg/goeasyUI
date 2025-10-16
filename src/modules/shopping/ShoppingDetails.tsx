@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Download, Share2, Heart, Bell } from 'lucide-react';
+import TrustBadges from '../../components/TrustBadges';
 import { useApp } from '../../context/AppContext';
 import ImageWithFallback from '../../components/ImageWithFallback';
+import CompareModal from '../../components/CompareModal';
 
 type Product = {
   id: string;
@@ -16,6 +18,12 @@ export default function ShoppingDetails() {
   const [product, setProduct] = useState<Product | null>(null);
   const [variant, setVariant] = useState<{ color?: string; size?: string }>({});
   const [showQA, setShowQA] = useState(false);
+  const [showBox, setShowBox] = useState(false);
+  const [showWarranty, setShowWarranty] = useState(false);
+  const [, setCompare] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('compareList') || '[]'); } catch { return []; }
+  });
+  const [showCompare, setShowCompare] = useState(false);
   const app = useApp();
   const { setCurrentPage, favorites, setFavorite } = app;
   const { pushNotification } = app as { pushNotification: (arg: { module: 'offers' | 'system' | 'wallet' | 'travel' | 'food' | 'tickets' | 'shopping'; title: string; message: string }) => void };
@@ -224,9 +232,61 @@ export default function ShoppingDetails() {
                 </div>
               </div>
             )}
+            <div className="mt-4">
+              <TrustBadges context="detail" />
+            </div>
+          </div>
+
+          {/* What's in the box */}
+          <div className="mt-6">
+            <button onClick={()=> setShowBox(s=>!s)} className="text-sm underline text-teal-700">{showBox? 'Hide':'Show'} What’s in the box</button>
+            {showBox && (
+              <ul className="mt-2 list-disc ml-6 text-sm text-gray-700 space-y-1">
+                <li>Main product unit</li>
+                <li>Charging cable / power adapter</li>
+                <li>User manual & warranty card</li>
+                <li>Accessory pack (if applicable)</li>
+              </ul>
+            )}
+          </div>
+
+          {/* Warranty */}
+          <div className="mt-4">
+            <button onClick={()=> setShowWarranty(s=>!s)} className="text-sm underline text-teal-700">{showWarranty? 'Hide':'Show'} Warranty</button>
+            {showWarranty && (
+              <div className="mt-2 text-sm text-gray-700">
+                <div>1-year manufacturer warranty against manufacturing defects.</div>
+                <div>Exchange/repair handled by authorized service centers.</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      {/* Compare bar */}
+      <div className="fixed bottom-16 inset-x-0 flex justify-center pointer-events-none">
+        <div className="pointer-events-auto bg-white border rounded-2xl shadow p-3 flex items-center gap-3">
+          <button onClick={()=> {
+            if (!product) return;
+            setCompare(prev => {
+              const next = prev.includes(product.id) ? prev : [...prev, product.id].slice(-3);
+              // persist ids for legacy key
+              localStorage.setItem('compareList', JSON.stringify(next));
+              // also persist full product payloads for modal
+              try {
+                const raw = localStorage.getItem('compareItems');
+                const arr: Product[] = raw ? JSON.parse(raw) : [];
+                const exists = arr.find(a => a.id === product.id);
+                const updated = exists ? arr : [...arr, product].slice(-3);
+                localStorage.setItem('compareItems', JSON.stringify(updated));
+              } catch { /* ignore */ }
+              return next;
+            });
+          }} className="px-3 py-1.5 text-sm rounded-lg border">Add to Compare</button>
+          <button onClick={()=> setShowCompare(true)} className="px-3 py-1.5 text-sm rounded-lg bg-gray-900 text-white">View Compare</button>
+          <button onClick={()=> { setCompare([]); localStorage.setItem('compareList','[]'); }} className="px-3 py-1.5 text-sm rounded-lg border">Clear</button>
+        </div>
+      </div>
+      <CompareModal open={showCompare} onClose={()=> setShowCompare(false)} />
     </div>
   );
 }
