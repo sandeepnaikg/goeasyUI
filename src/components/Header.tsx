@@ -9,7 +9,18 @@ import {
   Bell,
   Heart,
 } from "lucide-react";
-import { FaPlane, FaUtensils, FaTicketAlt, FaShoppingBag, FaHome, FaGamepad, FaFutbol, FaTrain, FaBus, FaHotel } from 'react-icons/fa';
+import {
+  FaPlane,
+  FaUtensils,
+  FaTicketAlt,
+  FaShoppingBag,
+  FaHome,
+  FaGamepad,
+  FaFutbol,
+  FaTrain,
+  FaBus,
+  FaHotel,
+} from "react-icons/fa";
 import { useApp } from "../context/AppContext";
 import { useEffect, useState } from "react";
 import GlobalSearch from "./GlobalSearch";
@@ -32,6 +43,15 @@ export default function Header() {
   const [topup, setTopup] = useState<string>("500");
   const [showExplore, setShowExplore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [heroGrad, setHeroGrad] = useState<string>(() => {
+    try {
+      return (
+        localStorage.getItem("heroGradient") || "from-teal-500 to-cyan-600"
+      );
+    } catch {
+      return "from-teal-500 to-cyan-600";
+    }
+  });
   const unreadCount = (notifications || []).filter((n) => !n.read).length;
   const wishlistCount = favorites
     ? Object.values(favorites).filter(Boolean).length
@@ -80,12 +100,30 @@ export default function Header() {
       const y = window.scrollY || document.documentElement.scrollTop;
       setScrolled(y > 20);
     };
-    window.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
-    return () =>
-      {
-        window.removeEventListener("cart-updated", handler as EventListener);
-        window.removeEventListener('scroll', onScroll);
-      };
+    window.addEventListener("scroll", onScroll, {
+      passive: true,
+    } as AddEventListenerOptions);
+    const onHeroGrad = () => {
+      try {
+        const v =
+          localStorage.getItem("heroGradient") || "from-teal-500 to-cyan-600";
+        setHeroGrad(() => v);
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener(
+      "hero-gradient-changed",
+      onHeroGrad as EventListener
+    );
+    return () => {
+      window.removeEventListener("cart-updated", handler as EventListener);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener(
+        "hero-gradient-changed",
+        onHeroGrad as EventListener
+      );
+    };
   }, []);
 
   const handleBack = () => {
@@ -104,7 +142,13 @@ export default function Header() {
   };
 
   return (
-  <header className={`sticky top-0 z-50 border-b border-white/10 transition-all ${scrolled ? 'backdrop-blur bg-[#0A1D5E]/90 shadow-md' : 'bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] shadow-lg'}`}>
+    <header
+      className={`sticky top-0 z-[70] border-b border-white/10 transition-all ${
+        scrolled
+          ? "backdrop-blur bg-[#0A1D5E]/90 shadow-md"
+          : "bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] shadow-lg"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar: reduced height */}
         <div className="flex justify-between items-center h-12">
@@ -148,10 +192,12 @@ export default function Header() {
             {/* Explore moved near logo */}
             <button
               onClick={() => setShowExplore((s) => !s)}
-              className="inline-flex shrink-0 px-3 sm:px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all border items-center gap-2 text-white/90 hover:text-white hover:bg-white/10 border-white/20"
+              className={`inline-flex shrink-0 px-3 sm:px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all items-center gap-2 text-white shadow-sm bg-gradient-to-r ${heroGrad} btn-sweep`}
               title="Explore Services"
             >
-              <span className="inline-flex items-center justify-center w-4 h-4"><FaHome className="w-3.5 h-3.5"/></span>
+              <span className="inline-flex items-center justify-center w-4 h-4">
+                <FaHome className="w-3.5 h-3.5" />
+              </span>
               Explore Services
             </button>
           </div>
@@ -166,7 +212,7 @@ export default function Header() {
             </button>
             <button
               onClick={handleWalletClick}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-md hover:from-teal-600 hover:to-teal-700 transition-all shadow"
+              className={`shine relative overflow-hidden flex items-center space-x-1.5 px-3 py-1.5 text-white rounded-md transition-all shadow bg-gradient-to-r ${heroGrad} btn-sweep`}
             >
               <Wallet className="w-4 h-4" />
               <span className="font-semibold text-sm">
@@ -264,14 +310,18 @@ export default function Header() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage("signup")}
-                  className="px-3 py-1.5 rounded-md bg-white text-[#0A1D5E] font-semibold hover:bg-gray-100"
+                  className="shine relative overflow-hidden px-3 py-1.5 rounded-md bg-white text-[#0A1D5E] font-semibold hover:bg-gray-100"
                 >
                   Sign up
                 </button>
                 <button
                   onClick={() => {
-                    try { localStorage.setItem('quickAuthProvider', 'google'); } catch { /* ignore */ }
-                    setCurrentPage('signup');
+                    try {
+                      localStorage.setItem("quickAuthProvider", "google");
+                    } catch {
+                      /* ignore */
+                    }
+                    setCurrentPage("signup");
                   }}
                   className="px-2.5 py-1.5 rounded-md bg-red-500 text-white text-xs font-semibold"
                   title="Continue with Google"
@@ -280,8 +330,12 @@ export default function Header() {
                 </button>
                 <button
                   onClick={() => {
-                    try { localStorage.setItem('quickAuthProvider', 'apple'); } catch { /* ignore */ }
-                    setCurrentPage('signup');
+                    try {
+                      localStorage.setItem("quickAuthProvider", "apple");
+                    } catch {
+                      /* ignore */
+                    }
+                    setCurrentPage("signup");
                   }}
                   className="px-2.5 py-1.5 rounded-md bg-black text-white text-xs font-semibold"
                   title="Continue with Apple"
@@ -294,27 +348,145 @@ export default function Header() {
         </div>
       </div>
       {showExplore && (
-        <div className="border-t border-white/10 bg-[#0A1D5E] text-white">
+        <div
+          className={`border-t border-white/10 text-white slide-up sticky top-12 z-[60] bg-[#0A1D5E] md:bg-gradient-to-r ${heroGrad}`}
+        >
           <div className="max-w-7xl mx-auto px-4 py-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {[
-              { label: 'Flights', icon: <FaPlane/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-flights'); } },
-              { label: 'Trains', icon: <FaTrain/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-trains'); } },
-              { label: 'Buses', icon: <FaBus/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-buses'); } },
-              { label: 'Hotels', icon: <FaHotel/> , to: ()=> { setCurrentModule('travel'); setCurrentPage('travel-hotels'); } },
-              { label: 'Food', icon: <FaUtensils/> , to: ()=> { setCurrentModule('food'); setCurrentPage('food-home'); } },
-              { label: 'Movies', icon: <FaTicketAlt/> , to: ()=> { setCurrentModule('tickets'); setCurrentPage('tickets-home'); } },
-              { label: 'Shopping', icon: <FaShoppingBag/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
-              { label: 'Gaming', icon: <FaGamepad/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
-              { label: 'Sports', icon: <FaFutbol/> , to: ()=> { setCurrentModule('shopping'); setCurrentPage('shopping-home'); } },
-              { label: 'Wallet', icon: <Wallet className="w-4 h-4"/>, to: ()=> { setCurrentModule('wallet'); setCurrentPage('wallet-home'); } },
-              { label: 'Offers', icon: <Gift className="w-4 h-4"/>, to: ()=> { try { localStorage.setItem('selectedOfferCode', 'GOZY50'); } catch { /* ignore */ } setCurrentPage('home'); } },
-              { label: 'Help', icon: <Bell className="w-4 h-4"/>, to: ()=> { setCurrentPage('help-center'); } },
-            ].map(s => (
-              <button key={s.label} onClick={()=> { setShowExplore(false); s.to(); }} className="bg-white/10 hover:bg-white/15 rounded-xl p-3 flex items-center gap-2">
-                <span className="w-6 h-6 inline-flex items-center justify-center">{s.icon}</span>
-                <span className="text-sm font-semibold">{s.label}</span>
-              </button>
-            ))}
+              {
+                label: "Flights",
+                icon: <FaPlane />,
+                to: () => {
+                  setCurrentModule("travel");
+                  setCurrentPage("travel-flights");
+                },
+              },
+              {
+                label: "Trains",
+                icon: <FaTrain />,
+                to: () => {
+                  setCurrentModule("travel");
+                  setCurrentPage("travel-trains");
+                },
+              },
+              {
+                label: "Buses",
+                icon: <FaBus />,
+                to: () => {
+                  setCurrentModule("travel");
+                  setCurrentPage("travel-buses");
+                },
+              },
+              {
+                label: "Hotels",
+                icon: <FaHotel />,
+                to: () => {
+                  setCurrentModule("travel");
+                  setCurrentPage("travel-hotels");
+                },
+              },
+              {
+                label: "Food",
+                icon: <FaUtensils />,
+                to: () => {
+                  setCurrentModule("food");
+                  setCurrentPage("food-home");
+                },
+              },
+              {
+                label: "Movies",
+                icon: <FaTicketAlt />,
+                to: () => {
+                  setCurrentModule("tickets");
+                  setCurrentPage("tickets-home");
+                },
+              },
+              {
+                label: "Shopping",
+                icon: <FaShoppingBag />,
+                to: () => {
+                  setCurrentModule("shopping");
+                  setCurrentPage("shopping-home");
+                },
+              },
+              {
+                label: "Gaming",
+                icon: <FaGamepad />,
+                to: () => {
+                  setCurrentModule("shopping");
+                  setCurrentPage("shopping-home");
+                },
+              },
+              {
+                label: "Sports",
+                icon: <FaFutbol />,
+                to: () => {
+                  setCurrentModule("shopping");
+                  setCurrentPage("shopping-home");
+                },
+              },
+              {
+                label: "Wallet",
+                icon: <Wallet className="w-4 h-4" />,
+                to: () => {
+                  setCurrentModule("wallet");
+                  setCurrentPage("wallet-home");
+                },
+              },
+              {
+                label: "Offers",
+                icon: <Gift className="w-4 h-4" />,
+                to: () => {
+                  try {
+                    localStorage.setItem("selectedOfferCode", "GOZY50");
+                  } catch {
+                    /* ignore */
+                  }
+                  setCurrentPage("home");
+                },
+              },
+              {
+                label: "Help",
+                icon: <Bell className="w-4 h-4" />,
+                to: () => {
+                  setCurrentPage("help-center");
+                },
+              },
+            ].map((s) => {
+              const key = `lastUsed:${s.label.toLowerCase()}`;
+              let suggested = false;
+              try {
+                const ts = Number(localStorage.getItem(key) || 0);
+                suggested = Date.now() - ts < 1000 * 60 * 60 * 24 * 3; // 3 days
+              } catch {
+                /* ignore */
+              }
+              return (
+                <button
+                  key={s.label}
+                  onClick={() => {
+                    try {
+                      localStorage.setItem(key, String(Date.now()));
+                    } catch {
+                      /* ignore */
+                    }
+                    setShowExplore(false);
+                    s.to();
+                  }}
+                  className="bg-white/10 hover:bg-white/15 rounded-xl p-3 flex items-center gap-2"
+                >
+                  <span className="w-6 h-6 inline-flex items-center justify-center">
+                    {s.icon}
+                  </span>
+                  <span className="text-sm font-semibold">{s.label}</span>
+                  {suggested && (
+                    <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-amber-400/90 text-black font-bold badge-pop">
+                      Suggested
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

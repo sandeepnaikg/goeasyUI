@@ -2,6 +2,121 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme tokens */
+:root {
+  --brand: #7c3aed; /* violet-600 */
+  --brand-50: #f5f3ff;
+  --brand-100: #ede9fe;
+  --brand-300: #a78bfa;
+  --brand-500: #8b5cf6;
+  --brand-600: #7c3aed;
+  --brand-700: #6d28d9;
+
+  --success: #10b981; /* emerald-500 */
+  --warning: #f59e0b; /* amber-500 */
+}
+
+/* Reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 600ms ease, transform 600ms ease, scale 600ms ease;
+}
+.reveal.fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal.fade-in {
+  transform: none;
+}
+.reveal.fade-in.is-visible {
+  opacity: 1;
+}
+.reveal.zoom-in {
+  transform: scale(0.96);
+}
+.reveal.zoom-in.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Shine hover effect for cards/images */
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -150%;
+  width: 120%;
+  height: 300%;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 60%
+  );
+  transform: rotate(8deg);
+  transition: transform 0.6s ease;
+}
+.shine:hover::after {
+  transform: translateX(180%) rotate(8deg);
+}
+
+/* slide-up animation */
+@keyframes slideUp {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.slide-up {
+  animation: slideUp 220ms ease-out;
+}
+
+/* brief pulse highlight for emphasized results */
+@keyframes pulseHighlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+.pulse-highlight {
+  animation: pulseHighlight 900ms ease-out;
+}
+
+/* subtle hero breathing gradient animation */
+@keyframes breatheHue {
+  0% {
+    filter: hue-rotate(0deg) saturate(100%);
+  }
+  50% {
+    filter: hue-rotate(8deg) saturate(110%);
+  }
+  100% {
+    filter: hue-rotate(0deg) saturate(100%);
+  }
+}
+.hero-breathe {
+  animation: breatheHue 9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-breathe {
+    animation: none;
+  }
+}
+
 /* small pop-in animation for coupon papercut */
 @keyframes paperPopIn {
   0% {
@@ -40,10 +155,145 @@
   animation: badgePop 220ms ease-out;
 }
 
+/* Micro-interactions */
+.card-lift {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+.pressable {
+  transition: transform 100ms ease, filter 120ms ease;
+}
+.pressable:active {
+  transform: translateY(1px);
+  filter: brightness(0.96);
+}
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.bounce-in {
+  animation: bounceIn 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Confetti */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-20vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(80vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Brand utilities (purple theme) */
+.text-brand {
+  color: var(--brand-600);
+}
+.bg-brand {
+  background-color: var(--brand-600);
+}
+.badge-brand {
+  background: var(--brand-50);
+  color: var(--brand-700);
+  border: 1px solid var(--brand-100);
+}
+.btn-brand {
+  background-image: linear-gradient(90deg, var(--brand-700), var(--brand-500));
+  color: #fff;
+}
+.btn-brand:hover {
+  filter: brightness(1.05);
+}
+.ring-brand {
+  box-shadow: 0 0 0 2px var(--brand-300);
+}
+
+/* Glass surface utility */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Gradient border wrapper: apply bg-gradient-to-r ... on the wrapper, content inside */
+.gradient-border {
+  position: relative;
+  padding: 1px; /* hairline */
+  border-radius: 0.75rem; /* match rounded-xl */
+}
+.gradient-border > .gradient-content {
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.9);
+}
+.dark .gradient-border > .gradient-content {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* CTA sweep (subtle) */
+.btn-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sweep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255, 255, 255, 0.22),
+    transparent
+  );
+  transform: skewX(-12deg);
+}
+.btn-sweep:hover::after {
+  left: 120%;
+  transition: left 0.35s ease;
+}
+
+/* Tilt hover (micro) */
+.tilt-hover {
+  transform-style: preserve-3d;
+  transition: transform 160ms ease;
+}
+.tilt-hover:hover {
+  transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-2px);
+}
+
+/* Parallax container hooks (JS applies transform) */
+.parallax-wrap {
+  perspective: 1200px;
+}
+.parallax-item {
+  will-change: transform;
+  transition: transform 300ms ease;
+}
+
 html,
 body,
 #root {
   height: 100%;
+  /* Subtle purple canvas gradient (header/footer unchanged) */
+  background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
 }
 
 /* Prevent horizontal overflow caused by large fixed elements or wide content */

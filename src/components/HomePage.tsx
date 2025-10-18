@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Plane,
   UtensilsCrossed,
@@ -92,14 +92,132 @@ const modules = [
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [particlesReady, setParticlesReady] = useState(false);
   // Hero carousel is always visible on desktop web version
   const { user, setCurrentModule, setCurrentPage } = useApp();
+  const [continueChips, setContinueChips] = useState<
+    Array<{ id: string; label: string; onClick: () => void }>
+  >([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % offers.length);
     }, 4000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Continue chips based on persisted state across modules
+  useEffect(() => {
+    const chips: Array<{ id: string; label: string; onClick: () => void }> = [];
+    try {
+      const travel = localStorage.getItem("travelSearch");
+      if (travel) {
+        const t = JSON.parse(travel) as Record<string, unknown>;
+        const from =
+          typeof t.fromLocation === "string" ? t.fromLocation : "From";
+        const to = typeof t.toLocation === "string" ? t.toLocation : "To";
+        chips.push({
+          id: "continue-travel",
+          label: `Resume: ${from} → ${to}`,
+          onClick: () => {
+            setCurrentModule("travel");
+            setCurrentPage("travel-flights");
+            setTimeout(() => {
+              const el = document.getElementById("trend-top");
+              el?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 0);
+          },
+        });
+      }
+      const food = localStorage.getItem("foodCart");
+      if (food) {
+        const f = JSON.parse(food) as { items?: Record<string, number> };
+        const count = f?.items
+          ? Object.values(f.items).reduce((a, b) => a + (b || 0), 0)
+          : 0;
+        if (count > 0) {
+          chips.push({
+            id: "continue-food",
+            label: `Continue food order (${count})`,
+            onClick: () => {
+              setCurrentModule("food");
+              setCurrentPage("food-cart");
+            },
+          });
+        }
+      }
+      const shop = localStorage.getItem("shoppingCart");
+      if (shop) {
+        const s = JSON.parse(shop) as { items?: unknown[] };
+        const count = Array.isArray(s?.items) ? s.items.length : 0;
+        if (count > 0) {
+          chips.push({
+            id: "continue-shopping",
+            label: `Continue shopping (${count})`,
+            onClick: () => {
+              setCurrentModule("shopping");
+              setCurrentPage("shopping-cart");
+            },
+          });
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    setContinueChips(chips);
+  }, [setCurrentModule, setCurrentPage]);
+
+  // lightweight particles for hero
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mql.matches) return; // respect reduced motion
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let raf = 0;
+    let w = (canvas.width = canvas.offsetWidth * window.devicePixelRatio);
+    let h = (canvas.height = canvas.offsetHeight * window.devicePixelRatio);
+    const density = Math.min(40, Math.floor((w * h) / (180 * 180))); // cap for FPS
+    const parts = Array.from({ length: density }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: 1 + Math.random() * 2,
+      vx: (-0.2 + Math.random() * 0.4) * window.devicePixelRatio,
+      vy: (0.2 + Math.random() * 0.6) * window.devicePixelRatio,
+      a: 0.2 + Math.random() * 0.5,
+    }));
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of parts) {
+        ctx.globalAlpha = p.a;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y > h) {
+          p.y = -10;
+          p.x = Math.random() * w;
+        }
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    const onResize = () => {
+      w = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      h = canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    };
+    window.addEventListener("resize", onResize);
+    setParticlesReady(true);
+    raf = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   const nextSlide = () => {
@@ -110,9 +228,33 @@ export default function HomePage() {
     setCurrentSlide((prev) => (prev - 1 + offers.length) % offers.length);
   };
 
+  // Share current hero gradient with the header/explore via localStorage + event
+  useEffect(() => {
+    try {
+      const grad = offers[currentSlide]?.color || "from-teal-500 to-cyan-600";
+      localStorage.setItem("heroGradient", grad);
+      window.dispatchEvent(new Event("hero-gradient-changed"));
+    } catch {
+      /* ignore */
+    }
+  }, [currentSlide]);
+  useEffect(() => {
+    // initialize on mount as well
+    try {
+      const grad = offers[0]?.color || "from-teal-500 to-cyan-600";
+      localStorage.setItem("heroGradient", grad);
+      window.dispatchEvent(new Event("hero-gradient-changed"));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const handleModuleClick = (moduleId: string) => {
     // If user is not signed in, require signup first
-    if (!user) { setCurrentPage('signup'); return; }
+    if (!user) {
+      setCurrentPage("signup");
+      return;
+    }
     setCurrentModule(moduleId as ModuleType);
     setCurrentPage(`${moduleId}-home`);
   };
@@ -207,11 +349,11 @@ export default function HomePage() {
           // Flights and metro prefer icons; trains/buses/hotels may use images
           let image = rawImage;
           try {
-            if (typeStr && typeStr.toLowerCase().includes('train')) {
+            if (typeStr && typeStr.toLowerCase().includes("train")) {
               image = rawImage || defaultMap.train;
-            } else if (typeStr && typeStr.toLowerCase().includes('bus')) {
+            } else if (typeStr && typeStr.toLowerCase().includes("bus")) {
               image = rawImage || defaultMap.bus;
-            } else if (typeStr && typeStr.toLowerCase().includes('hotel')) {
+            } else if (typeStr && typeStr.toLowerCase().includes("hotel")) {
               image = rawImage || defaultMap.hotel;
             } else {
               // flight or metro or unknown: prefer icon (so leave image undefined when not provided)
@@ -337,6 +479,12 @@ export default function HomePage() {
         {/* Signup prompt removed per request: logged-out users see Home without signup banner */}
 
         <div className="relative mb-5 rounded-2xl overflow-hidden shadow-lg h-52 md:h-72 hero-banner">
+          <canvas
+            ref={canvasRef}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
+              particlesReady ? "opacity-40" : "opacity-0"
+            }`}
+          />
           {offers.map((offer, index) => (
             <div
               key={offer.id}
@@ -346,7 +494,7 @@ export default function HomePage() {
               onClick={() => handleSlideNavigate(offer.module)}
             >
               <div
-                className={`w-full h-full bg-gradient-to-r ${offer.color} flex items-center justify-center text-white p-12 cursor-pointer`}
+                className={`w-full h-full bg-gradient-to-r ${offer.color} flex items-center justify-center text-white p-12 cursor-pointer hero-breathe`}
               >
                 <div className="text-center">
                   <h2 className="h-dense-hero mb-3">{offer.title}</h2>
@@ -358,7 +506,15 @@ export default function HomePage() {
                       e.stopPropagation();
                       handleSlideNavigate(offer.module);
                     }}
-                    className="px-6 py-2.5 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg text-sm"
+                    className={`px-6 py-2.5 rounded-full font-semibold transition-colors shadow-lg text-sm text-white ${
+                      offer.color.includes("from-teal-")
+                        ? "bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700"
+                        : offer.color.includes("from-red-")
+                        ? "bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
+                        : offer.color.includes("from-purple-")
+                        ? "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
+                        : "bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+                    }`}
                   >
                     Explore Now
                   </button>
@@ -394,8 +550,76 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Continue chips */}
+        {continueChips.length > 0 && (
+          <div className="mb-4 -mt-2 flex flex-wrap gap-2">
+            {continueChips.map((c) => (
+              <button
+                key={c.id}
+                onClick={c.onClick}
+                className="px-3 py-1.5 rounded-full border-2 border-brand-200 bg-brand-50 text-brand-700 text-sm btn-sweep"
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Pick up where you left off */}
+        {recents.length > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-gray-900">
+                Pick up where you left off
+              </h3>
+              <button
+                onClick={() => setCurrentPage("recently-viewed")}
+                className="text-sm text-brand-600 hover:underline"
+              >
+                See all
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {recents.slice(0, 3).map((r) => (
+                <button
+                  key={`resume_${r.id}`}
+                  onClick={() => handleRepeat(r)}
+                  className="group p-3 rounded-2xl bg-white border border-gray-200 hover:shadow-md transition-all text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    {r.image ? (
+                      <img
+                        src={r.image}
+                        alt={r.label}
+                        className="w-14 h-14 object-cover rounded-xl"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 font-bold text-sm">
+                        {r.type.toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-900 truncate">
+                        {r.label}
+                      </div>
+                      <div className="text-xs text-gray-600 truncate">
+                        {r.sub}
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      ₹{r.total.toLocaleString()}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Explore Services</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Explore Services
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 cards-grid">
             {modules.map((module) => {
               const Icon = module.icon;
@@ -405,17 +629,27 @@ export default function HomePage() {
                   onClick={() => handleModuleClick(module.id)}
                   className="group relative overflow-hidden bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 p-3 text-left border border-gray-200 h-full"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-10 transition-opacity`}
+                  />
 
                   <div className="relative z-10 flex flex-col h-full">
-                    <div className={`${module.bgColor} w-9 h-9 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
+                    <div
+                      className={`${module.bgColor} w-9 h-9 rounded-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}
+                    >
                       <Icon className={`w-4 h-4 ${module.iconColor}`} />
                     </div>
 
-                    <h4 className="text-base font-bold text-gray-900 mb-1">{module.name}</h4>
-                    <p className="text-gray-600 text-sm line-clamp-2">{module.description}</p>
+                    <h4 className="text-base font-bold text-gray-900 mb-1">
+                      {module.name}
+                    </h4>
+                    <p className="text-gray-600 text-sm line-clamp-2">
+                      {module.description}
+                    </p>
 
-                    <div className={`mt-auto pt-1.5 text-sm font-semibold bg-gradient-to-r ${module.color} bg-clip-text text-transparent`}>
+                    <div
+                      className={`mt-auto pt-1.5 text-sm font-semibold text-brand-600 group-hover:underline`}
+                    >
                       Explore →
                     </div>
                   </div>
@@ -440,18 +674,22 @@ export default function HomePage() {
         {/* Recently viewed chips */}
         {recents.length > 0 && (
           <div className="mb-6 -mt-1">
-            <div className="text-sm text-gray-500 mb-2 font-semibold">Recently Viewed</div>
+            <div className="text-sm text-gray-500 mb-2 font-semibold">
+              Recently Viewed
+            </div>
             <div className="flex flex-wrap gap-2">
-              {[...new Map(recents.map(r => [r.label, r])).values()].slice(0, 8).map((r) => (
-                <button
-                  key={`chip_${r.id}`}
-                  onClick={() => handleRepeat(r)}
-                  className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-sm border border-gray-200"
-                  title={`${r.label} • ${r.type}`}
-                >
-                  {r.label}
-                </button>
-              ))}
+              {[...new Map(recents.map((r) => [r.label, r])).values()]
+                .slice(0, 8)
+                .map((r) => (
+                  <button
+                    key={`chip_${r.id}`}
+                    onClick={() => handleRepeat(r)}
+                    className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-sm border border-gray-200"
+                    title={`${r.label} • ${r.type}`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
             </div>
           </div>
         )}
@@ -459,9 +697,11 @@ export default function HomePage() {
         {/* Deals you might like */}
         <section className="mb-10">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-xl font-bold text-gray-900">Deals you might like</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              Deals you might like
+            </h2>
             <button
-              onClick={() => setCurrentPage('offers')}
+              onClick={() => setCurrentPage("offers")}
               className="text-cyan-500 hover:text-cyan-600 text-sm font-semibold"
             >
               View All →
@@ -469,14 +709,78 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { id: 1, title: 'Goa Getaway', subtitle: 'Flight + 3N stay', image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop', price: 12999, meta: '3 Nights' },
-              { id: 2, title: 'Biryani Bonanza', subtitle: 'Up to 50% OFF', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop', price: 199, meta: 'for two' },
-              { id: 3, title: 'Movie Weekend', subtitle: '₹99 Tickets', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop', price: 99, meta: 'limited time' },
-              { id: 4, title: 'Smart Watch', subtitle: 'Mega Sale', image: 'https://gourban.in/cdn/shop/files/Pulse.jpg?v=1749553994&width=1024', price: 2999, meta: 'Best seller' },
-              { id: 5, title: 'Himalayan Escape', subtitle: 'Flight + 4N stay', image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=800&auto=format&fit=crop', price: 24999, meta: '4 Nights' },
-              { id: 6, title: 'Pizza Party', subtitle: 'Buy 1 Get 1', image: 'https://images.unsplash.com/photo-1548365328-9f547fb09530?q=80&w=800&auto=format&fit=crop', price: 399, meta: 'today only' },
-              { id: 7, title: 'Wireless Buds', subtitle: 'Steal Deal', image: 'https://www.lapcare.com/cdn/shop/files/1_6122ca29-5373-4c4f-97c2-0728ea368fc1.webp?v=1757326029&width=1024', price: 1499, meta: 'Limited stock' },
-              { id: 8, title: 'Comedy Night', subtitle: '20% OFF', image: 'https://media.indulgexpress.com/indulgexpress/2025-08-19/2t6keqzc/Zakir-Khan?w=1200&h=675&auto=format%2Ccompress&fit=max&enlarge=true', price: 299, meta: 'This week' },
+              {
+                id: 1,
+                title: "Goa Getaway",
+                subtitle: "Flight + 3N stay",
+                image:
+                  "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop",
+                price: 12999,
+                meta: "3 Nights",
+              },
+              {
+                id: 2,
+                title: "Biryani Bonanza",
+                subtitle: "Up to 50% OFF",
+                image:
+                  "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop",
+                price: 199,
+                meta: "for two",
+              },
+              {
+                id: 3,
+                title: "Movie Weekend",
+                subtitle: "₹99 Tickets",
+                image:
+                  "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop",
+                price: 99,
+                meta: "limited time",
+              },
+              {
+                id: 4,
+                title: "Smart Watch",
+                subtitle: "Mega Sale",
+                image:
+                  "https://gourban.in/cdn/shop/files/Pulse.jpg?v=1749553994&width=1024",
+                price: 2999,
+                meta: "Best seller",
+              },
+              {
+                id: 5,
+                title: "Himalayan Escape",
+                subtitle: "Flight + 4N stay",
+                image:
+                  "https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=800&auto=format&fit=crop",
+                price: 24999,
+                meta: "4 Nights",
+              },
+              {
+                id: 6,
+                title: "Pizza Party",
+                subtitle: "Buy 1 Get 1",
+                image:
+                  "https://images.unsplash.com/photo-1548365328-9f547fb09530?q=80&w=800&auto=format&fit=crop",
+                price: 399,
+                meta: "today only",
+              },
+              {
+                id: 7,
+                title: "Wireless Buds",
+                subtitle: "Steal Deal",
+                image:
+                  "https://www.lapcare.com/cdn/shop/files/1_6122ca29-5373-4c4f-97c2-0728ea368fc1.webp?v=1757326029&width=1024",
+                price: 1499,
+                meta: "Limited stock",
+              },
+              {
+                id: 8,
+                title: "Comedy Night",
+                subtitle: "20% OFF",
+                image:
+                  "https://media.indulgexpress.com/indulgexpress/2025-08-19/2t6keqzc/Zakir-Khan?w=1200&h=675&auto=format%2Ccompress&fit=max&enlarge=true",
+                price: 299,
+                meta: "This week",
+              },
             ].map((d) => (
               <CardTile
                 key={d.id}
@@ -488,10 +792,13 @@ export default function HomePage() {
                 onClick={() => {
                   // Navigate to relevant module by inspecting title heuristically
                   const t = d.title.toLowerCase();
-                  if (t.includes('goa') || t.includes('escape')) handleModuleClick('travel');
-                  else if (t.includes('biryani') || t.includes('pizza')) handleModuleClick('food');
-                  else if (t.includes('movie') || t.includes('comedy')) handleModuleClick('tickets');
-                  else handleModuleClick('shopping');
+                  if (t.includes("goa") || t.includes("escape"))
+                    handleModuleClick("travel");
+                  else if (t.includes("biryani") || t.includes("pizza"))
+                    handleModuleClick("food");
+                  else if (t.includes("movie") || t.includes("comedy"))
+                    handleModuleClick("tickets");
+                  else handleModuleClick("shopping");
                 }}
                 accentColor="blue"
               />
