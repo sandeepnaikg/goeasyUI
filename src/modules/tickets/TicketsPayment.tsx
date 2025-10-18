@@ -45,7 +45,16 @@ export default function TicketsPayment() {
     const lastCombos: Record<string, number> | null = lastCombosRaw
       ? JSON.parse(lastCombosRaw)
       : null;
-    const initial = [
+    const initial: {
+      id: string;
+      name: string;
+      price: number;
+      qty: number;
+      icon: "popcorn" | "soda" | "coffee";
+      cals?: number;
+      tag?: string;
+      img?: string;
+    }[] = [
       {
         id: "combo-popcorn",
         name: "Popcorn Bucket",

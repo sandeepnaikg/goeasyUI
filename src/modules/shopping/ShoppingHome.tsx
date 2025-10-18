@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Search, Heart, Star, TrendingUp, Zap } from "lucide-react";
 import {
   FaLaptop,
