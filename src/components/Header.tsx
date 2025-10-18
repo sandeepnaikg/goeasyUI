@@ -22,10 +22,11 @@ import {
   FaHotel,
 } from "react-icons/fa";
 import { useApp } from "../context/AppContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GlobalSearch from "./GlobalSearch";
 
 export default function Header() {
+  const headerRef = useRef<HTMLElement | null>(null);
   const {
     user,
     wallet,
@@ -126,6 +127,23 @@ export default function Header() {
     };
   }, []);
 
+  // Initial and resize-based header offset measurement
+  useEffect(() => {
+    const recalc = () => {
+      const h = headerRef.current?.offsetHeight || 64;
+      document.documentElement.style.setProperty("--app-header-offset", `${h}px`);
+    };
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => window.removeEventListener("resize", recalc);
+  }, []);
+
+  // Recalculate header height only when condensed state toggles
+  useEffect(() => {
+    const h = headerRef.current?.offsetHeight || 64;
+    document.documentElement.style.setProperty("--app-header-offset", `${h}px`);
+  }, [scrolled]);
+
   const handleBack = () => {
     if (prevPage) {
       // keep module intact when navigating back
@@ -143,7 +161,8 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-[70] border-b border-white/10 transition-all ${
+      ref={headerRef}
+      className={`fixed top-0 left-0 right-0 z-[100] border-b border-white/10 transition-all will-change-transform ${
         scrolled
           ? "backdrop-blur bg-[#0A1D5E]/90 shadow-md"
           : "bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] shadow-lg"

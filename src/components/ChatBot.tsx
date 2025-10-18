@@ -107,6 +107,7 @@ export default function ChatBot() {
   const send = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const isGreeting = /^(hi|hello|hey)\b/i.test(trimmed) || /^hi\s*i'?m\s*gozy/i.test(trimmed) || /^hello\s*i'?m\s*gozy/i.test(trimmed);
     // handle chip commands like FROM:BLR, TO:GOX, DATE:2025-11-03
     if (trimmed.startsWith('FROM:') || trimmed.startsWith('TO:') || trimmed.startsWith('DATE:')) {
       handleFlowCommand(trimmed);
@@ -114,11 +115,14 @@ export default function ChatBot() {
     }
     const m: ChatMsg = { id: `u_${Date.now()}`, role: 'user', text: trimmed };
     setMessages((prev) => [...prev, m]);
-    try {
-      const next = [trimmed, ...recents.filter(r => r !== trimmed)].slice(0, 5);
-      setRecents(next);
-      localStorage.setItem('chatRecents', JSON.stringify(next));
-    } catch { /* ignore */ }
+    // Do not save simple greetings to recent chips
+    if (!isGreeting) {
+      try {
+        const next = [trimmed, ...recents.filter(r => r !== trimmed)].slice(0, 5);
+        setRecents(next);
+        localStorage.setItem('chatRecents', JSON.stringify(next));
+      } catch { /* ignore */ }
+    }
     setIsTyping(true);
     setTimeout(() => respond(trimmed), 2000);
   };
@@ -187,6 +191,13 @@ export default function ChatBot() {
   const respond = (userText: string) => {
     const t = userText.toLowerCase();
     // very simple intent parsing
+    // greetings/intros
+    if (t === 'hello' || t === 'hi' || t === 'hey') {
+      return pushBot(greetings[lang] || greetings['en']);
+    }
+    if (/^hi\s*i'?m\s*gozy/.test(t) || /^hello\s*i'?m\s*gozy/.test(t)) {
+      return pushBot("Nice to meet you! I’m Gozy Assistant. How can I help?");
+    }
   if (/book.*flight|flight.*book|search.*flight/i.test(t)) { startFlightFlow(); return; }
   if (/flight|plane|air/i.test(t)) return pushBot('Opening flights for you ✈️', () => quickNav('flights'));
     if (/hotel|stay/i.test(t)) return pushBot('Taking you to hotels 🏨', () => { setCurrentModule('travel'); setCurrentPage('travel-hotels'); setOpen(false); });
@@ -414,8 +425,14 @@ export default function ChatBot() {
               <button onClick={() => quickNav('help')} className="flex items-center gap-2 p-2 rounded-xl border hover:bg-gray-50 col-span-3"><HelpCircle className="w-4 h-4"/>Help Center</button>
             </div>
 
-            {/* Scrollable content: messages + recents/flow/suggestions */}
+            {/* Scrollable content: suggestions first, then messages */}
             <div ref={listRef} className="flex-1 overflow-y-auto p-3 space-y-3">
+              {/* Contextual suggestions */}
+              <div className="flex flex-wrap gap-2">
+                {getSuggestions(currentPage).map(s => (
+                  <button key={s} onClick={()=> send(s)} className="px-3 py-1.5 rounded-full bg-gray-50 hover:bg-gray-100 text-xs border">{s}</button>
+                ))}
+              </div>
               {messages.map(m => (
                 <div key={m.id} className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${m.role==='bot' ? 'bg-gray-100 text-gray-800' : 'bg-indigo-600 text-white ml-auto'}`}>{m.text}</div>
               ))}
@@ -446,6 +463,13 @@ export default function ChatBot() {
                 </div>
               )}
               {/* Suggested prompts */}
+              {/* Intro chips: user asked for 'hello' and 'Hi I’m Gozy' side-by-side */}
+              <div className="flex flex-wrap gap-2">
+                {['hello', "Hi I'm Gozy"].map((s) => (
+                  <button key={s} onClick={()=> send(s)} className="px-3 py-1.5 rounded-full bg-gray-50 hover:bg-gray-100 text-xs border">{s}</button>
+                ))}
+              </div>
+              {/* Contextual suggestions */}
               <div className="flex flex-wrap gap-2">
                 {getSuggestions(currentPage).map(s => (
                   <button key={s} onClick={()=> send(s)} className="px-3 py-1.5 rounded-full bg-gray-50 hover:bg-gray-100 text-xs border">{s}</button>

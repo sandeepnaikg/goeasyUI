@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Star, Clock, ChevronLeft, ChevronRight, Flame, Heart } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import ImageWithFallback from '../../components/ImageWithFallback';
-import BookedRecentlyCard from '../../components/BookedRecentlyCard';
 import OffersStrip from '../../components/OffersStrip';
 import ShareReferralButton from '../../components/ShareReferralButton';
 
@@ -165,6 +164,16 @@ const offers = [
 export default function TicketsHome() {
   const [currentOffer, setCurrentOffer] = useState(0);
   const { setCurrentPage, favorites, setFavorite, addRecentlyViewed } = useApp();
+  const [paused, setPaused] = useState(false);
+
+  // Auto-advance the hero carousel like Shopping/Dashboard
+  useEffect(() => {
+    if (paused) return;
+    const id = window.setInterval(() => {
+      setCurrentOffer((i) => (i + 1) % offers.length);
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, [paused]);
 
   const handleMovieClick = (movie: typeof movies[0]) => {
     localStorage.setItem('selectedMovie', JSON.stringify(movie));
@@ -175,23 +184,16 @@ export default function TicketsHome() {
   return (
   <div className="min-h-screen bg-[#F3F0FF] pb-20">
     <div className="app-shell py-5">
-        <div className="mb-4">
-          <BookedRecentlyCard module="tickets" />
-        </div>
-        <div className="mb-1 flex items-center justify-between">
-          <div />
-          <ShareReferralButton />
-        </div>
-        <OffersStrip offers={[
-          { code: 'MOVIE20', label: 'Movies: 20% OFF (cap ₹150)' },
-          { code: 'GOZY50', label: 'Flat ₹50 OFF' }
-        ]} />
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Book Movie Tickets</h1>
-          <p className="text-gray-600 text-sm">Experience cinema like never before</p>
-        </div>
-
-  <div className="relative mb-8 rounded-2xl overflow-hidden shadow h-40">
+        {/* Hero carousel up top (full-bleed billboard) */}
+        <div className="full-bleed relative mb-8">
+          <div className="mx-auto app-shell">
+            <div
+              className="relative rounded-2xl overflow-hidden shadow h-48 md:h-64 lg:h-72"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+              onTouchStart={() => setPaused(true)}
+              onTouchEnd={() => setPaused(false)}
+            >
           {offers.map((offer, index) => (
             <div
               key={offer.id}
@@ -207,7 +209,6 @@ export default function TicketsHome() {
               </div>
             </div>
           ))}
-
           <button
             onClick={() => setCurrentOffer((currentOffer - 1 + offers.length) % offers.length)}
             className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
@@ -233,6 +234,22 @@ export default function TicketsHome() {
               />
             ))}
           </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Top utility row: offers + referral */}
+        <div className="mb-1 flex items-center justify-between">
+          <div />
+          <ShareReferralButton />
+        </div>
+        <OffersStrip offers={[
+          { code: 'MOVIE20', label: 'Movies: 20% OFF (cap ₹150)' },
+          { code: 'GOZY50', label: 'Flat ₹50 OFF' }
+        ]} />
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Book Movie Tickets</h1>
+          <p className="text-gray-600 text-sm">Experience cinema like never before</p>
         </div>
 
         <div className="mb-8">

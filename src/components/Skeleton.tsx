@@ -6,19 +6,13 @@ export function SkeletonLine({
   height?: number;
 }) {
   return (
-    <div
-      className="animate-pulse bg-gray-200 rounded"
-      style={{ width, height }}
-    />
+    <div className="skeleton rounded" style={{ width, height }} />
   );
 }
 
 export function SkeletonAvatar({ size = 40 }: { size?: number }) {
   return (
-    <div
-      className="animate-pulse bg-gray-200 rounded-full"
-      style={{ width: size, height: size }}
-    />
+    <div className="skeleton rounded-full" style={{ width: size, height: size }} />
   );
 }
 
@@ -51,7 +45,7 @@ export function SkeletonGrid({ count = 6 }: { count?: number }) {
           key={i}
           className="border border-gray-200 rounded-2xl p-3 bg-white"
         >
-          <div className="w-full h-28 bg-gray-200 rounded mb-2 animate-pulse" />
+          <div className="w-full h-28 skeleton rounded mb-2" />
           <SkeletonLine width="70%" height={12} />
           <div className="mt-2">
             <SkeletonLine width="50%" height={10} />

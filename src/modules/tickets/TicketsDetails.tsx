@@ -74,11 +74,21 @@ export default function TicketsDetails() {
     { date: '2025-10-11', day: 'Fri' }
   ];
 
+  // Parse times like "01:30 PM" into 24h hour number for accurate slot filtering
+  const to24Hour = (t: string) => {
+    const [hhmm, ampm] = t.split(' ');
+    const [hhStr] = hhmm.split(':');
+    let hh = parseInt(hhStr, 10);
+    if (ampm?.toUpperCase() === 'PM' && hh !== 12) hh += 12;
+    if (ampm?.toUpperCase() === 'AM' && hh === 12) hh = 0;
+    return hh;
+  };
+
   if (!movie) return null;
 
   return (
   <div className="min-h-screen bg-white pb-24 text-gray-900">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl overflow-hidden mb-6 border border-gray-200 shadow">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
             <div className="md:col-span-1">
@@ -132,63 +142,67 @@ export default function TicketsDetails() {
           </div>
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Date</h2>
-          <div className="mb-3"><TrustBadges context="detail" /></div>
-          <div className="flex space-x-3 overflow-x-auto pb-2">
-            {dates.map((d) => (
-              <button
-                key={d.date}
-                onClick={() => setSelectedDate(d.date)}
-                className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold transition-all ${
-                  selectedDate === d.date
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
-              >
-                <div className="text-sm">{d.day}</div>
-                <div className="text-xs opacity-70">{d.date.slice(8)}</div>
-              </button>
-            ))}
+        {/* Sticky date + filters bar */}
+        <div className="sticky top-[var(--app-header-offset)] z-30 sticky-smooth -mx-4 mb-6">
+          <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              {/* Dates */}
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {dates.map((d) => (
+                  <button
+                    key={d.date}
+                    onClick={() => setSelectedDate(d.date)}
+                    className={`pressable flex-shrink-0 px-4 py-2 rounded-xl font-semibold transition-all ${
+                      selectedDate === d.date
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="text-xs md:text-sm">{d.day}</div>
+                    <div className="text-[10px] md:text-xs opacity-70">{d.date.slice(8)}</div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                <div>
+                  <div className="text-xs md:text-sm font-semibold mb-1">Format</div>
+                  <select value={formatFilter} onChange={e=> setFormatFilter(e.target.value as typeof formatFilter)} className="w-full px-3 py-2 border rounded-lg bg-white">
+                    {(['any','2D','3D','IMAX','4DX'] as const).map(f=> <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <div className="text-xs md:text-sm font-semibold mb-1">Language</div>
+                  <select value={languageFilter} onChange={e=> setLanguageFilter(e.target.value as typeof languageFilter)} className="w-full px-3 py-2 border rounded-lg bg-white">
+                    {(['any','English','Hindi','Tamil','Telugu'] as const).map(l=> <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <div className="text-xs md:text-sm font-semibold mb-1">Time</div>
+                  <select value={timeSlot} onChange={e=> setTimeSlot(e.target.value as typeof timeSlot)} className="w-full px-3 py-2 border rounded-lg bg-white">
+                    <option value="any">Any</option>
+                    <option value="morning">Morning (9-12)</option>
+                    <option value="afternoon">Afternoon (12-17)</option>
+                    <option value="evening">Evening (17-21)</option>
+                    <option value="night">Night (21-24)</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg pressable">Venue map</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div>
-              <div className="text-sm font-semibold mb-1">Format</div>
-              <select value={formatFilter} onChange={e=> setFormatFilter(e.target.value as typeof formatFilter)} className="w-full px-3 py-2 border rounded-lg">
-                {(['any','2D','3D','IMAX','4DX'] as const).map(f=> <option key={f} value={f}>{f}</option>)}
-              </select>
-            </div>
-            <div>
-              <div className="text-sm font-semibold mb-1">Language</div>
-              <select value={languageFilter} onChange={e=> setLanguageFilter(e.target.value as typeof languageFilter)} className="w-full px-3 py-2 border rounded-lg">
-                {(['any','English','Hindi','Tamil','Telugu'] as const).map(l=> <option key={l} value={l}>{l}</option>)}
-              </select>
-            </div>
-            <div>
-              <div className="text-sm font-semibold mb-1">Time</div>
-              <select value={timeSlot} onChange={e=> setTimeSlot(e.target.value as typeof timeSlot)} className="w-full px-3 py-2 border rounded-lg">
-                <option value="any">Any</option>
-                <option value="morning">Morning (9-12)</option>
-                <option value="afternoon">Afternoon (12-17)</option>
-                <option value="evening">Evening (17-21)</option>
-                <option value="night">Night (21-24)</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg">Open venue map</a>
-            </div>
-          </div>
-        </div>
+        <div className="mb-4"><TrustBadges context="detail" /></div>
 
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-gray-900">Select Cinema & Show Time</h2>
 
           {theaters.map((theater) => (
-            <div key={theater.id} className="bg-white rounded-2xl p-6 border border-gray-200 shadow">
+            <div key={theater.id} className="surface-card rounded-2xl p-6 border border-gray-200 shadow-glow">
               <div className="mb-4">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{theater.name}</h3>
                 <div className="flex flex-wrap gap-2">
@@ -208,7 +222,7 @@ export default function TicketsDetails() {
                   .filter(show => formatFilter==='any' || show.type.toUpperCase()===formatFilter)
                   .filter(show => {
                     if (timeSlot==='any') return true;
-                    const h = parseInt(show.time.split(':')[0], 10);
+                    const h = to24Hour(show.time);
                     if (timeSlot==='morning') return h>=9 && h<12;
                     if (timeSlot==='afternoon') return h>=12 && h<17;
                     if (timeSlot==='evening') return h>=17 && h<21;
@@ -218,7 +232,7 @@ export default function TicketsDetails() {
                   <button
                     key={show.id}
                     onClick={() => handleShowSelect(theater, show)}
-                    className="relative bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl p-4 text-left transition-all group"
+                    className="relative bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl p-4 text-left transition-all group pressable"
                   >
                     <div className="text-gray-900 font-bold mb-1">{show.time}</div>
                     <div className="text-gray-600 text-sm mb-2">{show.type}</div>

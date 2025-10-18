@@ -100,7 +100,7 @@ export default function ShoppingDetails() {
   if (!product)
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-1">
@@ -170,7 +170,7 @@ export default function ShoppingDetails() {
 
   return (
     <div className="min-h-screen bg-white pb-28">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-1">

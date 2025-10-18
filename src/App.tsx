@@ -65,6 +65,7 @@ import RecentlyViewedPage from "./components/RecentlyViewedPage";
 import Wishlist from "./components/Wishlist";
 import SupportFab from "./components/SupportFab";
 import ChatBot from "./components/ChatBot";
+import ScrollProgress from "./components/ScrollProgress";
 
 function AppContent() {
   const { currentPage, setCurrentPage } = useApp();
@@ -345,7 +346,10 @@ function AppContent() {
   return (
     <>
       <Header />
-      {renderPage()}
+      <ScrollProgress />
+      <div key={currentPage} className="page-enter">
+        {renderPage()}
+      </div>
       <ChatBot />
       <SupportFab />
       <Toast />

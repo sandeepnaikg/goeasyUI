@@ -657,7 +657,7 @@ export default function TravelHome() {
         {selectedDest && (
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40" onClick={() => { setSelectedDest(null); setJustAppliedFromModal(false); }} />
-            <div className="relative bg-white w-full max-w-3xl mx-4 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh]">
+            <div className="relative bg-white w-full max-w-4xl mx-4 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh]">
               {/* Close (minimize) button */}
               <button
                 aria-label="Close"

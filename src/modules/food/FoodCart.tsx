@@ -109,7 +109,7 @@ export default function FoodCart() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Cart</h1>
 
         {/* Stack content vertically and make each section full width */}

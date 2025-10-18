@@ -352,7 +352,7 @@ export default function WalletHome() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_20%_20%,#ede9fe,#f5f3ff)] dark:bg-[radial-gradient(circle_at_20%_20%,#0d1f21,#1a1033)] transition-colors">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-6">My Wallet</h1>
         {/* Strong Pay Later banner */}
         {payLater?.enabled && (

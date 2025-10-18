@@ -29,7 +29,7 @@ export default function ShoppingCart() {
   if (!cart || cart.items.length === 0)
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-4">
             <StepIndicator
               steps={["Browse", "Cart", "Payment", "Confirm"]}
@@ -86,7 +86,7 @@ export default function ShoppingCart() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-3">
           <StepIndicator
             steps={["Browse", "Cart", "Payment", "Confirm"]}

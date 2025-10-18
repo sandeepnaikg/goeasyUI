@@ -3,6 +3,9 @@ import { ArrowLeft, BadgeCheck, Star, Heart } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import ImageWithFallback from '../../components/ImageWithFallback';
 import OffersStrip from '../../components/OffersStrip';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
 
 type Hotel = {
   id: string;
@@ -64,9 +67,9 @@ export default function TravelHotels() {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <OffersStrip offers={[{ code: 'STAY20', label: 'Stay: 20% OFF up to ₹500' }]} />
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 sticky z-10" style={{ top: 'var(--app-header-offset)' }}>
           <button
             onClick={() => setCurrentPage(prevPage || 'travel-home')}
             className="inline-flex items-center space-x-2 px-3 py-2 rounded-lg border-2 border-gray-200 hover:border-teal-500 transition-colors"
@@ -74,14 +77,14 @@ export default function TravelHotels() {
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </button>
-          <h1 className="text-3xl font-bold">Hotels</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Hotels</h1>
           <div className="w-24" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {sortedHotels.map(h => {
             const total = h.pricePerNight * nights;
             return (
-              <div key={h.id} className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 hover:shadow-xl transition-transform hover:scale-[1.02]">
+              <Card key={h.id} gradient className="overflow-hidden hover:shadow-xl transition-transform hover:scale-[1.02]">
                 <div className="relative h-48">
                   <ImageWithFallback src={h.image} alt={h.name} className="w-full h-full object-cover" />
                   <button
@@ -91,13 +94,13 @@ export default function TravelHotels() {
                   >
                     <Heart className={`w-4 h-4 ${favorites[`hotel:${h.id}`] ? 'fill-white' : ''}`} />
                   </button>
-                  <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full text-xs font-bold text-gray-800 inline-flex items-center gap-1">
+                  <Badge className="absolute top-3 right-3 bg-white border-gray-200 text-gray-800">
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {h.rating}
-                  </div>
+                  </Badge>
                   {h.rating >= 4.7 && (
-                    <div className="absolute bottom-3 left-3 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1">
+                    <Badge className="absolute bottom-3 left-3 text-emerald-700 bg-emerald-50 border-emerald-200">
                       <BadgeCheck className="w-3 h-3" /> Rare find
-                    </div>
+                    </Badge>
                   )}
                 </div>
                 <div className="p-4">
@@ -114,18 +117,18 @@ export default function TravelHotels() {
                       <div className="text-xs text-gray-500">₹{total.toLocaleString()} total • {nights} night{nights>1?'s':''} • {guests} guest{guests>1?'s':''}</div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button onClick={() => handleSelect(h)} className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200">Select</button>
-                      <button onClick={() => { handleSelect(h); handleBook(); }} className="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded hover:from-teal-600 hover:to-cyan-700">Book</button>
+                      <Button variant="subtle" onClick={() => handleSelect(h)}>Select</Button>
+                      <Button onClick={() => { handleSelect(h); handleBook(); }}>Book</Button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
 
         {selected && (
-          <div className="mt-8 bg-white rounded-2xl shadow p-6">
+          <Card className="mt-8">
             <h2 className="text-2xl font-bold mb-2">Selected Hotel</h2>
             <div className="flex items-center space-x-6">
               <div className="w-36 h-24 overflow-hidden rounded">
@@ -138,10 +141,10 @@ export default function TravelHotels() {
               </div>
               <div className="text-right">
                 <div className="font-bold text-lg">₹{selected.pricePerNight.toLocaleString()} / night</div>
-                <button onClick={handleBook} className="mt-4 px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded">Continue</button>
+                <Button className="mt-4" onClick={handleBook}>Continue</Button>
               </div>
             </div>
-          </div>
+          </Card>
         )}
       </div>
     </div>

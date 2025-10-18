@@ -38,7 +38,7 @@ export default function ShoppingSearch() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />

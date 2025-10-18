@@ -34,7 +34,7 @@ export default function ShoppingTracking() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+  <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="bg-white rounded-3xl shadow-xl p-8">
           <div className="flex items-center space-x-4 mb-4">
             <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white">

@@ -14,6 +14,11 @@ import OffersStrip from "../../components/OffersStrip";
 import StepIndicator from "../../components/StepIndicator";
 import ErrorBlock from "../../components/ErrorBlock";
 import { SkeletonCard } from "../../components/Skeleton";
+import Segmented from "../../components/ui/Segmented";
+import Chip from "../../components/ui/Chip";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Badge from "../../components/ui/Badge";
 
 type FareFamily = "Lite" | "Value" | "Flexi";
 
@@ -153,10 +158,22 @@ export default function TravelFlights() {
     max: 0,
   });
   const [priceAlert, setPriceAlert] = useState(false);
+  const [toolbarCompact, setToolbarCompact] = useState(false);
 
   useEffect(() => {
     const data = localStorage.getItem("travelSearch");
     if (data) setSearchData(JSON.parse(data));
+  }, []);
+
+  // Compact the sticky header card on scroll to save vertical space
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      setToolbarCompact(y > 120);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true } as AddEventListenerOptions);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const formatYmd = (d: Date) => {
@@ -384,7 +401,12 @@ export default function TravelFlights() {
             { code: "HDFC10", label: "10% OFF on Cards" },
           ]}
         />
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-6 sticky top-20 z-10">
+        <div
+          className={`bg-white rounded-2xl shadow-md mb-6 sticky z-[90] shadow-glow transition-all sticky-smooth ${
+            toolbarCompact ? "p-3" : "p-6"
+          }`}
+          style={{ top: "var(--app-header-offset)" }}
+        >
           <div className="flex justify-between items-center flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <button
@@ -395,65 +417,42 @@ export default function TravelFlights() {
                 <span>Back</span>
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className={`${toolbarCompact ? "text-xl" : "text-2xl"} font-bold text-gray-900`}>
                   {searchData?.fromLocation} → {searchData?.toLocation}
                 </h1>
-                <p className="text-gray-600">
+                <p className={`text-gray-600 ${toolbarCompact ? "text-xs" : "text-sm"}`}>
                   {formatYmd(chosenDate)} • {searchData?.travelers} Traveler(s)
                 </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center space-x-2 px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-brand-500 transition-colors"
-              >
+              <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="inline-flex items-center gap-2">
                 <Filter className="w-5 h-5" />
-                <span>Filters</span>
-              </button>
-              <button
+                Filters
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => {
                   setShowCalendar((v) => !v);
                   setCalendarViewDate(chosenDate);
                 }}
-                className="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-brand-500 transition-colors"
               >
                 Change date
-              </button>
+              </Button>
               {/* Value vs Speed intent toggle */}
-              <div
-                className="hidden md:inline-flex rounded-lg border-2 border-gray-300 overflow-hidden"
-                title="Value: sort by lowest price • Speed: sort by shortest duration"
-              >
-                <button
-                  onClick={() => {
-                    setIntent("value");
-                    setSortBy("price");
-                  }}
-                  className={`px-3 py-2 text-sm ${
-                    intent === "value"
-                      ? "bg-brand-600 text-white"
-                      : "bg-white hover:bg-brand-50 text-gray-800"
-                  }`}
-                  aria-pressed={intent === "value"}
-                >
-                  Value
-                </button>
-                <button
-                  onClick={() => {
-                    setIntent("speed");
-                    setSortBy("duration");
-                  }}
-                  className={`px-3 py-2 text-sm border-l-2 border-gray-300 ${
-                    intent === "speed"
-                      ? "bg-brand-600 text-white"
-                      : "bg-white hover:bg-brand-50 text-gray-800"
-                  }`}
-                  aria-pressed={intent === "speed"}
-                >
-                  Speed
-                </button>
-              </div>
+              <Segmented
+                className="hidden md:inline-flex"
+                value={intent}
+                onChange={(v) => {
+                  if (v === "value") setSortBy("price");
+                  else setSortBy("duration");
+                  setIntent(v);
+                }}
+                options={[
+                  { label: "Value", value: "value" },
+                  { label: "Speed", value: "speed" },
+                ]}
+              />
               <select
                 value={sortBy}
                 onChange={(e) =>
@@ -467,22 +466,23 @@ export default function TravelFlights() {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <Chip
                 onClick={() => setPriceAlert(!priceAlert)}
-                className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border-2 ${
-                  priceAlert
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 hover:border-amber-400"
-                }`}
+                selected={priceAlert}
+                className={priceAlert ? "border-amber-500 bg-amber-50 text-amber-700" : undefined}
               >
-                <Bell className="w-4 h-4" />
-                <span className="text-sm">Price alert</span>
-              </button>
+                <span className="inline-flex items-center gap-2 text-sm">
+                  <Bell className="w-4 h-4" /> Price alert
+                </span>
+              </Chip>
             </div>
           </div>
           {/* 7-day sparkline */}
           <div className="mt-4" id="trend-top">
-            <div className="flex items-center justify-between mb-1">
+            <div
+              className="flex items-center justify-between mb-1 sticky bg-white rounded-md px-2"
+              style={{ top: "calc(var(--app-header-offset) + 72px)" }}
+            >
               <div className="text-sm text-gray-700">7‑day price trend</div>
               {altDays.length > 0 &&
                 (() => {
@@ -547,6 +547,7 @@ export default function TravelFlights() {
               from={searchData?.fromLocation || ""}
               to={searchData?.toLocation || ""}
               date={searchData?.departureDate || ""}
+              compact={toolbarCompact}
             />
           </div>
           {/* Alt-day chips with cheapest fares */}
@@ -559,30 +560,28 @@ export default function TravelFlights() {
                   ...altDays.map((d) => d.price || Infinity)
                 );
                 return (
-                  <button
+                  <Chip
                     key={formatYmd(date)}
                     onClick={() => setDepartureDate(date)}
-                    className={`px-3 py-1.5 text-xs rounded-full border-2 whitespace-nowrap ${
-                      isActive
-                        ? "border-brand-600 text-brand-700 bg-brand-50"
-                        : "border-gray-200 text-gray-700 hover:border-brand-400"
-                    }`}
+                    size="sm"
+                    selected={isActive}
+                    className="whitespace-nowrap chip-focus"
                   >
                     <span className="font-semibold mr-2">{label}</span>
                     <span className="text-gray-600">
                       ₹{price.toLocaleString()}
                     </span>
                     {isToday && (
-                      <span className="ml-2 text-[10px] text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded">
+                      <Badge className="ml-2 text-purple-700 bg-purple-50 border border-purple-200">
                         Today
-                      </span>
+                      </Badge>
                     )}
                     {price === cheapest && (
-                      <span className="ml-2 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                      <Badge className="ml-2 text-emerald-700 bg-emerald-50 border-emerald-200">
                         Cheapest
-                      </span>
+                      </Badge>
                     )}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
@@ -609,7 +608,7 @@ export default function TravelFlights() {
           )}
           {/* Inline mini calendar */}
           {showCalendar && (
-            <div className="mt-4 p-4 border-2 border-gray-200 rounded-2xl bg-white">
+            <div className="mt-4 p-4 border-2 border-gray-200 rounded-2xl bg-white surface-card">
               <MiniCalendar
                 baseDate={calendarViewDate || chosenDate}
                 onSetMonth={(d) => setCalendarViewDate(d)}
@@ -644,7 +643,9 @@ export default function TravelFlights() {
                   Non-stop only
                 </label>
                 <div className="flex items-center justify-end gap-2">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       setNonStopOnly(false);
                       setDepBucket({
@@ -667,16 +668,12 @@ export default function TravelFlights() {
                       );
                       setAirlinesSel(reset);
                     }}
-                    className="px-3 py-1.5 text-xs rounded-lg border-2 border-gray-200 hover:border-brand-500"
                   >
                     Reset
-                  </button>
-                  <button
-                    onClick={() => setShowFilters(false)}
-                    className="px-3 py-1.5 text-xs rounded-lg bg-brand-600 text-white"
-                  >
+                  </Button>
+                  <Button size="sm" onClick={() => setShowFilters(false)}>
                     Done
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -689,19 +686,16 @@ export default function TravelFlights() {
                     {(
                       ["night", "morning", "afternoon", "evening"] as Bucket[]
                     ).map((b) => (
-                      <button
+                      <Chip
                         key={`dep-${b}`}
                         onClick={() =>
                           setDepBucket((prev) => ({ ...prev, [b]: !prev[b] }))
                         }
-                        className={`px-3 py-1.5 text-xs rounded-full border-2 ${
-                          depBucket[b]
-                            ? "border-brand-600 text-brand-700 bg-brand-50"
-                            : "border-gray-200 text-gray-700 hover:border-brand-400"
-                        }`}
+                        size="sm"
+                        selected={depBucket[b]}
                       >
                         {b[0].toUpperCase() + b.slice(1)}
-                      </button>
+                      </Chip>
                     ))}
                   </div>
                 </div>
@@ -713,19 +707,16 @@ export default function TravelFlights() {
                     {(
                       ["night", "morning", "afternoon", "evening"] as Bucket[]
                     ).map((b) => (
-                      <button
+                      <Chip
                         key={`arr-${b}`}
                         onClick={() =>
                           setArrBucket((prev) => ({ ...prev, [b]: !prev[b] }))
                         }
-                        className={`px-3 py-1.5 text-xs rounded-full border-2 ${
-                          arrBucket[b]
-                            ? "border-brand-600 text-brand-700 bg-brand-50"
-                            : "border-gray-200 text-gray-700 hover:border-brand-400"
-                        }`}
+                        size="sm"
+                        selected={arrBucket[b]}
                       >
                         {b[0].toUpperCase() + b.slice(1)}
-                      </button>
+                      </Chip>
                     ))}
                   </div>
                 </div>
@@ -822,8 +813,8 @@ export default function TravelFlights() {
           />
         </div>
 
-        {/* Sticky summary + quick chips bar */}
-        <div className="sticky top-40 z-10 -mt-2 mb-2">
+        {/* Quick chips bar (non-sticky to avoid intersection jump) */}
+        <div className="-mt-2 mb-2">
           <div className="bg-white/90 backdrop-blur rounded-full border border-gray-200 shadow-sm px-3 py-2 flex flex-wrap items-center gap-2">
             {(() => {
               if (baseList.length === 0) return null;
@@ -1032,25 +1023,21 @@ export default function TravelFlights() {
 
         <div className="space-y-4" id="results-top">
           {flights.map((flight) => (
-            <div
-              key={flight.id}
-              data-flight-card
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all p-6 border border-gray-100 card-lift"
-            >
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <Card key={flight.id} data-flight-card gradient className="card-lift" innerClassName="p-4">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2.5">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-brand-700 to-brand-500 rounded-xl flex items-center justify-center">
-                      <Plane className="w-6 h-6 text-white" />
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-brand-700 to-brand-500 rounded-xl flex items-center justify-center">
+                      <Plane className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">
+                      <h3 className="text-lg font-bold text-gray-900">
                         {flight.airline}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         {flight.flightNumber}
                       </p>
-                      <div className="flex items-center gap-3 text-xs text-gray-600 mt-1">
+                      <div className="flex items-center gap-3 text-[11px] text-gray-600 mt-1">
                         <span className="inline-flex items-center gap-1">
                           <Luggage className="w-3 h-3" /> 7kg cabin
                         </span>
@@ -1085,56 +1072,51 @@ export default function TravelFlights() {
                           // Non‑stop badge
                           if (flight.stops === 0) badges.push("Non‑stop");
                           return badges.slice(0, 3).map((b, i) => (
-                            <span
-                              key={`${flight.id}-badge-${i}`}
-                              className="px-2 py-0.5 rounded-full border bg-brand-50 border-brand-200 text-brand-700"
-                            >
-                              {b}
-                            </span>
+                            <Badge key={`${flight.id}-badge-${i}`}>{b}</Badge>
                           ));
                         })()}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-8">
+                  <div className="flex items-center space-x-6">
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">
+                      <div className="text-xl font-bold text-gray-900">
                         {flight.departure}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs text-gray-600">
                         {searchData?.fromLocation}
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col items-center">
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Clock className="w-4 h-4" />
-                        <span className="text-sm">{flight.duration}</span>
+                        <span className="text-xs">{flight.duration}</span>
                       </div>
-                      <div className="w-full h-0.5 bg-gray-300 my-2"></div>
-                      <div className="text-sm text-brand-600 font-semibold">
+                      <div className="w-full h-0.5 bg-gray-300 my-1.5"></div>
+                      <div className="text-xs text-brand-600 font-semibold">
                         {flight.stops === 0
                           ? "Non-stop"
                           : `${flight.stops} stop(s)`}
                       </div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">
+                      <div className="text-xl font-bold text-gray-900">
                         {flight.arrival}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs text-gray-600">
                         {searchData?.toLocation}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="min-w-[260px]">
-                  <div className="flex items-center justify-end space-x-1 mb-2">
+                <div className="min-w-[240px]">
+                  <div className="flex items-center justify-end space-x-1 mb-1.5">
                     <Star className="w-4 h-4 fill-green-500 text-green-500" />
                     <span className="font-semibold">{flight.rating}</span>
                   </div>
                   {/* price-lock toggle */}
-                  <div className="flex items-center justify-end mb-2">
+                  <div className="flex items-center justify-end mb-1.5">
                     <button
                       onClick={() => {
                         setPriceLock((v) => {
@@ -1166,31 +1148,32 @@ export default function TravelFlights() {
                       {priceLock ? "🔔 Price lock on" : "🔔 Price lock"}
                     </button>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div className="grid grid-cols-3 gap-1.5 text-sm">
                     {flight.fares.map((f) => (
-                      <button
+                      <Button
                         key={f.family}
                         onClick={() => handleSelectFlight(flight, f.family)}
-                        className="p-3 rounded-lg border-2 border-gray-200 hover:border-brand-500 hover:shadow transition-all text-left"
+                        variant="outline"
+                        className="p-2.5 text-left"
                       >
                         <div className="font-bold text-gray-900">
                           {f.family}
                         </div>
-                        <div className="text-brand-600 font-extrabold">
+                        <div className="text-brand-600 font-extrabold text-sm">
                           ₹{f.price.toLocaleString()}
                         </div>
-                        <div className="text-[11px] text-gray-600">
+                        <div className="text-[10px] text-gray-600">
                           {f.baggage}
                         </div>
-                        <div className="text-[11px] text-gray-600">
+                        <div className="text-[10px] text-gray-600">
                           {f.refund}
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
@@ -1202,10 +1185,12 @@ function Sparkline({
   from,
   to,
   date,
+  compact = false,
 }: {
   from: string;
   to: string;
   date: string;
+  compact?: boolean;
 }) {
   const [week, setWeek] = useState(0); // 0 = current 7-day window, -1 prev, +1 next, etc.
   const seed = Math.abs(
@@ -1230,7 +1215,7 @@ function Sparkline({
   const lowIdx = values.indexOf(min);
 
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-200 p-2 text-brand-600">
+    <div className={`bg-gray-50 rounded-xl border border-gray-200 text-brand-600 ${compact ? "p-1" : "p-2"}`}>
       <div className="flex items-center justify-between mb-1 text-xs text-gray-700">
         <div className="flex items-center gap-2">
           <button
@@ -1253,7 +1238,7 @@ function Sparkline({
           </span>
         </div>
       </div>
-      <svg viewBox="0 0 100 40" className="w-full h-20">
+      <svg viewBox="0 0 100 40" className={`w-full ${compact ? "h-14" : "h-20"}`}>
         <defs>
           <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="var(--brand-600)" stopOpacity="0.24" />
@@ -1268,13 +1253,13 @@ function Sparkline({
           strokeWidth="1.8"
         />
         {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={0.8} fill="var(--brand-700)" />
+          <circle key={i} cx={p.x} cy={p.y} r={compact ? 0.6 : 0.8} fill="var(--brand-700)" />
         ))}
         {/* min marker */}
         <circle
           cx={(lowIdx / 6) * 100}
           cy={points[lowIdx].y}
-          r={1.6}
+          r={compact ? 1.2 : 1.6}
           fill="#eab308"
         />
       </svg>

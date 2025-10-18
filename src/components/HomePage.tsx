@@ -17,6 +17,7 @@ import { useApp } from "../context/AppContext";
 import { ModuleType } from "../types";
 import ImageWithFallback from "./ImageWithFallback";
 import CardTile from "./CardTile";
+import DealsCarousel from "./DealsCarousel";
 import OffersStrip from "./OffersStrip";
 import RecentActivity from "./RecentActivity";
 
@@ -27,6 +28,8 @@ const offers = [
     subtitle: "Book now and save big on domestic flights",
     color: "from-teal-500 to-cyan-600",
     module: "travel" as const,
+    image:
+      "https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
   {
     id: 2,
@@ -34,6 +37,8 @@ const offers = [
     subtitle: "Get your favorite food delivered for free",
     color: "from-red-500 to-pink-600",
     module: "food" as const,
+    image:
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
   {
     id: 3,
@@ -41,6 +46,8 @@ const offers = [
     subtitle: "Limited time offer on weekend shows",
     color: "from-purple-500 to-indigo-600",
     module: "tickets" as const,
+    image:
+      "https://images.pexels.com/photos/7991319/pexels-photo-7991319.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
   {
     id: 4,
@@ -48,6 +55,8 @@ const offers = [
     subtitle: "Deals on electronics, fashion & more",
     color: "from-orange-500 to-red-600",
     module: "shopping" as const,
+    image:
+      "https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
 ];
 
@@ -478,7 +487,8 @@ export default function HomePage() {
       <div className="app-shell py-5 bg-white sm:rounded-2xl flex-1">
         {/* Signup prompt removed per request: logged-out users see Home without signup banner */}
 
-        <div className="relative mb-5 rounded-2xl overflow-hidden shadow-lg h-52 md:h-72 hero-banner">
+  {/* Myntra-style foreground banner: flat image, crisp object-cover, rounded strip */}
+  <div className="relative mb-5 rounded-2xl overflow-hidden shadow-lg h-52 md:h-72 hero-banner">
           <canvas
             ref={canvasRef}
             className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
@@ -493,32 +503,25 @@ export default function HomePage() {
               }`}
               onClick={() => handleSlideNavigate(offer.module)}
             >
-              <div
-                className={`w-full h-full bg-gradient-to-r ${offer.color} flex items-center justify-center text-white p-12 cursor-pointer hero-breathe`}
-              >
-                <div className="text-center">
-                  <h2 className="h-dense-hero mb-3">{offer.title}</h2>
-                  <p className="text-base sm:text-lg mb-4 font-medium">
-                    {offer.subtitle}
-                  </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSlideNavigate(offer.module);
-                    }}
-                    className={`px-6 py-2.5 rounded-full font-semibold transition-colors shadow-lg text-sm text-white ${
-                      offer.color.includes("from-teal-")
-                        ? "bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700"
-                        : offer.color.includes("from-red-")
-                        ? "bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
-                        : offer.color.includes("from-purple-")
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
-                        : "bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-                    }`}
-                  >
-                    Explore Now
-                  </button>
-                </div>
+              {/* Foreground banner image only (no gradient overlay) */}
+              <img
+                src={offer.image}
+                alt={offer.title}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+              />
+              {/* Optional centered CTA pill over image */}
+              <div className="relative w-full h-full flex items-center justify-center p-4 cursor-pointer">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSlideNavigate(offer.module);
+                  }}
+                  className="px-5 py-2 rounded-full font-semibold text-sm bg-white/90 hover:bg-white transition-colors shadow-md text-gray-900 pressable"
+                >
+                  Shop Now
+                </button>
               </div>
             </div>
           ))}
@@ -537,7 +540,7 @@ export default function HomePage() {
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
 
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
             {offers.map((_, index) => (
               <button
                 key={index}
@@ -547,6 +550,157 @@ export default function HomePage() {
                 }`}
               />
             ))}
+          </div>
+        </div>
+
+        {/* Top Deals by Module */}
+        <section className="mb-6">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-xl font-bold text-gray-900">Top Deals</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Travel */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow hover:shadow-lg transition-all">
+              <div className="p-4">
+                <div className="text-xs font-bold uppercase text-teal-700 bg-teal-50 inline-block px-2 py-0.5 rounded">Travel</div>
+                <h3 className="mt-2 text-lg font-bold text-gray-900">Flat ₹300 OFF Flights</h3>
+                <p className="text-sm text-gray-600">Use code GOFLY300 · Today only</p>
+                <button onClick={()=> { applyOfferForModule('travel'); handleModuleClick('travel'); }} className="mt-3 px-4 py-2 rounded-full bg-teal-600 text-white hover:bg-teal-700 text-sm">Book Now</button>
+              </div>
+              <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop" alt="Travel deal" className="w-full h-32 object-cover"/>
+            </div>
+            {/* Food */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow hover:shadow-lg transition-all">
+              <div className="p-4">
+                <div className="text-xs font-bold uppercase text-rose-700 bg-rose-50 inline-block px-2 py-0.5 rounded">Food</div>
+                <h3 className="mt-2 text-lg font-bold text-gray-900">50% OFF on Meals</h3>
+                <p className="text-sm text-gray-600">Use code GOZY50 · New users</p>
+                <button onClick={()=> { applyOfferForModule('food'); handleModuleClick('food'); }} className="mt-3 px-4 py-2 rounded-full bg-rose-600 text-white hover:bg-rose-700 text-sm">Order Now</button>
+              </div>
+              <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop" alt="Food deal" className="w-full h-32 object-cover"/>
+            </div>
+            {/* Tickets */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow hover:shadow-lg transition-all">
+              <div className="p-4">
+                <div className="text-xs font-bold uppercase text-purple-700 bg-purple-50 inline-block px-2 py-0.5 rounded">Tickets</div>
+                <h3 className="mt-2 text-lg font-bold text-gray-900">Movie Tickets at ₹99</h3>
+                <p className="text-sm text-gray-600">Weekends · Limited seats</p>
+                <button onClick={()=> { applyOfferForModule('tickets'); handleModuleClick('tickets'); }} className="mt-3 px-4 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 text-sm">Book Now</button>
+              </div>
+              <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop" alt="Tickets deal" className="w-full h-32 object-cover"/>
+            </div>
+            {/* Shopping - Shoes */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow hover:shadow-lg transition-all">
+              <div className="p-4">
+                <div className="text-xs font-bold uppercase text-orange-700 bg-orange-50 inline-block px-2 py-0.5 rounded">Shopping</div>
+                <h3 className="mt-2 text-lg font-bold text-gray-900">Shoes: Up to 70% OFF</h3>
+                <p className="text-sm text-gray-600">Top brands · Festive picks</p>
+                <button onClick={()=> { applyOfferForModule('shopping'); handleModuleClick('shopping'); }} className="mt-3 px-4 py-2 rounded-full bg-orange-600 text-white hover:bg-orange-700 text-sm">Shop Now</button>
+              </div>
+              <img src="https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=800&auto=format&fit=crop" alt="Shoes deal" className="w-full h-32 object-cover"/>
+            </div>
+          </div>
+        </section>
+
+        {/* Myntra-style deals carousels */}
+        <DealsCarousel
+          title="Shoes • Up to 70% OFF"
+          items={[
+            {
+              id: 'shoe1',
+              title: 'Nike Revolution',
+              subtitle: 'Men Running Shoes',
+              image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop',
+              price: 2799,
+              badge: '70% OFF',
+              cta: 'Shop Now',
+              onClick: () => { setCurrentModule('shopping'); setCurrentPage('shopping-category'); }
+            },
+            {
+              id: 'shoe2',
+              title: 'Adidas Lite Racer',
+              subtitle: 'Casual Sneakers',
+              image: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
+              price: 1999,
+              badge: '60% OFF',
+              cta: 'Shop Now',
+              onClick: () => { setCurrentModule('shopping'); setCurrentPage('shopping-category'); }
+            },
+            {
+              id: 'shoe3',
+              title: 'Puma Smash v2',
+              subtitle: 'Leather Sneakers',
+              image: 'https://images.unsplash.com/photo-1603808033192-27f5b8b9e1c1?q=80&w=800&auto=format&fit=crop',
+              price: 2499,
+              badge: '50% OFF',
+              cta: 'Shop Now',
+              onClick: () => { setCurrentModule('shopping'); setCurrentPage('shopping-category'); }
+            },
+            {
+              id: 'shoe4',
+              title: 'Campus Street',
+              subtitle: 'Everyday Sneakers',
+              image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=800&auto=format&fit=crop',
+              price: 1299,
+              badge: '40% OFF',
+              cta: 'Shop Now',
+              onClick: () => { setCurrentModule('shopping'); setCurrentPage('shopping-category'); }
+            },
+          ]}
+        />
+
+        <DealsCarousel
+          title="Food Deals Near You"
+          items={[
+            {
+              id: 'fd1',
+              title: 'Burger Bliss',
+              subtitle: 'Buy 1 Get 1',
+              image: 'https://images.unsplash.com/photo-1550317138-10000687a72b?q=80&w=800&auto=format&fit=crop',
+              price: 'from ₹149',
+              badge: 'B1G1',
+              cta: 'Order Now',
+              onClick: () => { setCurrentModule('food'); setCurrentPage('food-home'); }
+            },
+            {
+              id: 'fd2',
+              title: 'Pizza Party',
+              subtitle: '50% OFF',
+              image: 'https://images.unsplash.com/photo-1548365328-9f547fb09530?q=80&w=800&auto=format&fit=crop',
+              price: 'from ₹199',
+              badge: '50% OFF',
+              cta: 'Order Now',
+              onClick: () => { setCurrentModule('food'); setCurrentPage('food-home'); }
+            },
+            {
+              id: 'fd3',
+              title: 'Biryani Bonanza',
+              subtitle: 'Flat ₹120 OFF',
+              image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop',
+              price: 'from ₹179',
+              badge: 'FLAT ₹120',
+              cta: 'Order Now',
+              onClick: () => { setCurrentModule('food'); setCurrentPage('food-home'); }
+            },
+          ]}
+        />
+
+        {/* Sponsor ribbon row (optional) */}
+        <div className="mb-6 hidden sm:block">
+          <div className="flex items-center justify-between border rounded-2xl px-4 py-2 bg-white/90 overflow-x-auto">
+            <div className="flex items-center gap-2 pr-4 mr-4 border-r">
+              <span className="text-xs text-gray-500">Associate Sponsor</span>
+              <span className="text-sm font-semibold">U.S. POLO ASSN.</span>
+            </div>
+            <div className="flex items-center gap-2 pr-4 mr-4 border-r">
+              <span className="text-xs text-gray-500">Title Sponsor</span>
+              <span className="text-sm font-semibold">BIBA</span>
+              <span className="text-gray-400">•</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Associate Sponsor</span>
+              <span className="text-sm font-semibold">realme</span>
+            </div>
           </div>
         </div>
 

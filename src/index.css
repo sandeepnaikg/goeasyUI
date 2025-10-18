@@ -14,6 +14,9 @@
 
   --success: #10b981; /* emerald-500 */
   --warning: #f59e0b; /* amber-500 */
+
+  /* Sticky offset for content below header (can tune per breakpoint) */
+  --app-header-offset: 64px;
 }
 
 /* Reveal animations */
@@ -136,6 +139,72 @@
   animation: paperPopIn 300ms ease-out;
 }
 
+/* Button microinteractions */
+.pressable {
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+.pressable:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+.pressable:active {
+  transform: scale(0.98);
+}
+
+/* Ripple effect */
+.btn-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  transform: scale(0);
+  background: rgba(255, 255, 255, 0.35);
+  animation: ripple 600ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb; /* gray-200 */
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Page enter animation */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: pageIn 200ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes pageIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* small pop for badges */
 @keyframes badgePop {
   0% {
@@ -162,6 +231,20 @@
 .card-lift:hover {
   transform: translateY(-2px) scale(1.01);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+.surface-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+}
+.shadow-glow {
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.16),
+    0 8px 24px rgba(124, 58, 237, 0.15);
+}
+.chip-focus:focus-visible {
+  outline: 2px solid var(--brand-300);
+  outline-offset: 2px;
 }
 .pressable {
   transition: transform 100ms ease, filter 120ms ease;
@@ -279,6 +362,12 @@
   transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-2px);
 }
 
+/* Sticky helper to avoid GPU jank on iOS/Chrome */
+.sticky-smooth {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 /* Parallax container hooks (JS applies transform) */
 .parallax-wrap {
   perspective: 1200px;
@@ -292,13 +381,14 @@ html,
 body,
 #root {
   height: 100%;
-  /* Subtle purple canvas gradient (header/footer unchanged) */
-  background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
+  /* Purple app canvas */
+  background: linear-gradient(180deg, #f3e8ff 0%, #e9d5ff 100%);
 }
 
 /* Prevent horizontal overflow caused by large fixed elements or wide content */
 body {
   overflow-x: hidden;
+  padding-top: var(--app-header-offset);
 }
 
 /* Ensure app content doesn't get hidden behind fixed footer */
@@ -379,7 +469,8 @@ body {
   margin-right: auto;
   padding-left: 1rem; /* px-4 */
   padding-right: 1rem;
-  max-width: 1140px; /* narrowed from 1240px for denser desktop */
+  /* Align to Tailwind's max-w-7xl (80rem = 1280px) for parity with Shopping */
+  max-width: 80rem;
 }
 @media (min-width: 640px) {
   /* sm */
@@ -400,6 +491,16 @@ body {
 }
 .app-shell .section-tight {
   margin-bottom: 2rem;
+}
+
+/* Full-bleed utility: make a section span the full viewport width from within a centered container */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 /* Denser heading scale utilities */

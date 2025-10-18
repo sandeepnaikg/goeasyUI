@@ -118,7 +118,7 @@ export default function TravelDetails() {
   if (!flight)
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-3">
             <StepIndicator
               steps={[
@@ -157,7 +157,7 @@ export default function TravelDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-3">
           <StepIndicator
             steps={[

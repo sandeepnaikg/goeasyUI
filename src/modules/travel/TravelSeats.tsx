@@ -137,7 +137,7 @@ export default function TravelSeats() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-xl p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Choose your {mode === 'flight' ? 'Flight' : mode==='bus' ? 'Bus' : 'Train'} Seats</h1>
           <p className="text-gray-600 mb-4">Select exactly {requiredCount} seat{requiredCount>1?'s':''}. Window seats are marked as such.</p>

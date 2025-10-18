@@ -18,17 +18,23 @@ const DEFAULT_FALLBACK = `data:image/svg+xml;utf8,${encodeURIComponent(
 export default function ImageWithFallback({ src, alt, fallback, ...rest }: Props) {
   const [srcState, setSrcState] = useState<string | undefined>(typeof src === 'string' ? src : undefined);
 
+  const [loaded, setLoaded] = useState(false);
   const handleError: React.ReactEventHandler<HTMLImageElement> = () => {
     setSrcState(fallback || DEFAULT_FALLBACK);
   };
-
   return (
-    <img
-      {...rest}
-      src={srcState}
-      alt={alt}
-      loading="lazy"
-      onError={handleError}
-    />
+    <div className={`relative ${rest.className || ""}`.trim()} onClick={rest.onClick}>
+      {!loaded && <div className="absolute inset-0 skeleton" />}
+      <img
+        {...rest}
+        src={srcState}
+        alt={alt}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+        onError={handleError}
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
   );
 }

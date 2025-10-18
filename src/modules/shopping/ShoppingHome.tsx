@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Search, Heart, Star, TrendingUp, Zap } from "lucide-react";
 import {
   FaLaptop,
@@ -583,7 +583,7 @@ export default function ShoppingHome() {
                 {
                   id: "s1",
                   image:
-                    "https://images.pexels.com/photos/108061/pexels-photo-108061.jpeg?auto=compress&cs=tinysrgb&w=1600",
+                    "https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg?auto=compress&cs=tinysrgb&w=1600",
                   title: "Big Billion Days",
                   subtitle: "Unbelievable prices on top brands",
                   ctaText: "Shop Now",
@@ -592,7 +592,7 @@ export default function ShoppingHome() {
                 {
                   id: "s2",
                   image:
-                    "https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg?auto=compress&cs=tinysrgb&w=1600",
+                    "https://images.pexels.com/photos/108061/pexels-photo-108061.jpeg?auto=compress&cs=tinysrgb&w=1600",
                   title: "Festive Specials",
                   subtitle: "Decor, lighting and gifts up to 70% OFF",
                   ctaText: "Explore",
@@ -609,6 +609,15 @@ export default function ShoppingHome() {
                     localStorage.setItem("offersViewed", "1");
                     window.dispatchEvent(new Event("offers-open"));
                   },
+                },
+                {
+                  id: "s4",
+                  image:
+                    "https://images.pexels.com/photos/298861/pexels-photo-298861.jpeg?auto=compress&cs=tinysrgb&w=1600",
+                  title: "New Arrivals",
+                  subtitle: "Fresh drops in fashion & lifestyle",
+                  ctaText: "Browse",
+                  onClick: () => setCurrentPage("shopping-category"),
                 },
               ]}
             />

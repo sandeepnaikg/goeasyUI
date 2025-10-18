@@ -144,7 +144,7 @@ export default function TicketsSeats() {
 
   return (
     <div className="min-h-screen bg-white pb-32">
-      <div className="max-w-6xl mx-auto px-4 py-8 text-gray-900">
+  <div className="max-w-7xl mx-auto px-4 py-8 text-gray-900">
         <div className="mb-3">
           <StepIndicator
             steps={["Search", "Details", "Seats", "Payment", "Confirm"]}
@@ -276,7 +276,7 @@ export default function TicketsSeats() {
 
         {selectedSeats.length > 0 && (
           <div className="fixed bottom-20 left-0 right-0 bg-white shadow-2xl border-t-2 border-gray-200">
-            <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="max-w-7xl mx-auto px-4 py-4">
               <div className="flex justify-between items-center">
                 <div>
                   <div className="text-sm text-gray-600">

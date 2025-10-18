@@ -26,7 +26,7 @@ export default function WalletTransactions() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-900">All Transactions</h1>
           <button onClick={()=> setCurrentPage('wallet-home')} className="text-teal-600 font-semibold">Back to Wallet</button>

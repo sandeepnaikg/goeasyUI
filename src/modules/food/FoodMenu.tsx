@@ -109,7 +109,7 @@ export default function FoodMenu() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-4 py-8">
         {restaurant && (
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
             <div className="relative h-64">
@@ -248,7 +248,7 @@ export default function FoodMenu() {
 
       {getTotalItems() > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl">
-          <div className="max-w-5xl mx-auto px-4 py-4">
+          <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-sm text-gray-600">{getTotalItems()} items</div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import ImageWithFallback from "./ImageWithFallback";
 
 type Slide = {
   id: string;
@@ -44,25 +45,30 @@ export default function Carousel({
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden border border-gray-200 shadow">
-      <div className="h-[220px] md:h-[280px] relative">
+      <div className="h-[220px] md:h-[280px] relative bg-gray-100">
         {slides.map((s, i) => (
           <button
             key={s.id}
             onClick={() => s.onClick?.()}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out will-change-[opacity] ${
               i === index ? "opacity-100" : "opacity-0"
             }`}
             aria-label={s.title || "slide"}
           >
-            <img
+            <ImageWithFallback
               src={s.image}
               alt={s.title || ""}
               className="w-full h-full object-cover"
             />
             {(s.title || s.subtitle || s.ctaText) && (
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
             )}
-            <div className="absolute left-5 bottom-5 text-left">
+            <div
+              className={`absolute left-5 bottom-5 text-left transition-opacity duration-500 ${
+                i === index ? "opacity-100" : "opacity-0"
+              }`}
+              aria-hidden={i !== index}
+            >
               {s.title && (
                 <div className="text-white text-2xl md:text-3xl font-bold drop-shadow">
                   {s.title}

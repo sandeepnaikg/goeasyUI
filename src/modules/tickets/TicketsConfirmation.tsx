@@ -82,7 +82,7 @@ export default function TicketsConfirmation() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#0A1D5E] to-[#182B8F] pb-24">
-      <div className="max-w-3xl mx-auto px-4 py-12">
+  <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
             <CheckCircle className="w-12 h-12 text-green-600" />
